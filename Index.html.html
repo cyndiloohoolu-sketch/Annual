@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026–2027 台灣年曆｜國定假日・展覽・宜嫁娶・演唱會</title>
+<meta name="description" content="2026-2027台灣互動式年曆，含國定假日、台北展覽（南港展覽館）、農曆宜嫁娶吉日、演唱會資訊">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif TC',serif;min-height:100vh;background:linear-gradient(135deg,#fdf6ec 0%,#f5e6d3 40%,#ede0d4 100%);padding:24px 16px;color:#2c1810}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:30px;font-weight:900;letter-spacing:6px;color:#2c1810}
+.header p{font-size:12px;color:#8b6f47;margin-top:6px;letter-spacing:3px;font-style:italic}
+.filters{display:flex;justify-content:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;transition:all .2s;border-width:2px;border-style:solid}
+.year-tabs{display:flex;justify-content:center;gap:8px;margin-bottom:10px}
+.year-btn{padding:6px 20px;border-radius:20px;font-size:15px;font-weight:700}
+.month-scroll{display:flex;gap:5px;max-width:500px;margin:0 auto 16px;overflow-x:auto;padding-bottom:4px}
+.month-scroll::-webkit-scrollbar{height:4px}
+.month-scroll::-webkit-scrollbar-thumb{background:#c9b18a;border-radius:4px}
+.month-btn{padding:7px 0;min-width:46px;border-radius:8px;flex-shrink:0;font-size:13px;transition:all .2s}
+.cal-wrap{max-width:480px;margin:0 auto;background:rgba(255,255,255,.65);border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(44,24,16,.08);backdrop-filter:blur(8px)}
+.cal-title{text-align:center;font-size:20px;margin-bottom:12px;letter-spacing:4px;color:#2c1810}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wk-hdr{text-align:center;font-size:12px;font-weight:700;padding:4px 0}
+.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:15px;transition:all .15s;padding:0;border:2px solid transparent}
+.day-cell:hover{transform:scale(1.08)}
+.dots{display:flex;gap:2px;margin-top:2px;min-height:6px}
+.dot{width:5px;height:5px;border-radius:50%;display:inline-block}
+.panel{max-width:480px;margin:16px auto 0;border-radius:12px;padding:14px 18px}
+.panel h3{margin:0 0 10px;font-size:15px;letter-spacing:2px;display:flex;align-items:center;gap:6px}
+.panel-item{margin-bottom:10px;padding-bottom:10px}
+.tag{font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600;white-space:nowrap;color:#fff}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:13px;font-weight:600}
+.wed-chip{padding:4px 10px;border-radius:16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;margin:3px}
+.footer{max-width:480px;margin:24px auto 0;text-align:center;font-size:11px;color:#b09a7a;line-height:1.8}
+.footer p{margin:4px 0 0}
+.footer p:first-child{margin:0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const W=["日","一","二","三","四","五","六"],
+MN=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+ML=[];
+for(let m=4;m<12;m++)ML.push({y:2026,m});
+for(let m=0;m<12;m++)ML.push({y:2027,m});
+
+const p=n=>n<10?"0"+n:""+n,
+mk=(y,m)=>y+"-"+p(m+1),
+dk=(y,m,d)=>y+"-"+p(m+1)+"-"+p(d),
+dim=(y,m)=>new Date(y,m+1,0).getDate(),
+fdm=(y,m)=>new Date(y,m,1).getDay();
+
+const H={
+"2026-05-01":"勞動節","2026-05-02":"勞動節補假",
+"2026-06-19":"端午節","2026-06-20":"端午節補假","2026-06-21":"端午節彈性放假",
+"2026-09-25":"中秋節","2026-09-26":"中秋節補假","2026-09-27":"中秋節彈性放假","2026-09-28":"教師節",
+"2026-10-09":"國慶補假","2026-10-10":"國慶日","2026-10-11":"國慶彈性放假",
+"2026-10-24":"光復節補假","2026-10-25":"台灣光復節","2026-10-26":"光復節彈性放假",
+"2026-12-25":"行憲紀念日","2026-12-26":"行憲紀念日補假","2026-12-27":"行憲彈性放假",
+"2027-01-01":"元旦","2027-01-02":"元旦補假",
+"2027-02-05":"小年夜","2027-02-06":"除夕","2027-02-07":"春節初一","2027-02-08":"春節初二","2027-02-09":"春節初三","2027-02-10":"春節補假",
+"2027-02-28":"和平紀念日","2027-03-01":"228補假",
+"2027-04-04":"兒童節","2027-04-05":"清明節","2027-04-06":"清明補假",
+"2027-05-01":"勞動節","2027-06-09":"端午節",
+"2027-09-15":"中秋節","2027-09-28":"教師節",
+"2027-10-10":"國慶日","2027-10-11":"國慶補假","2027-10-25":"台灣光復節",
+"2027-12-25":"行憲紀念日"
+};
+
+const EX={
+"2026-05":[{n:"ATLife 臺灣輔具暨長照展",v:"南港展覽館1館",p:"5/14~5/17"},{n:"台北當代藝術博覽會",v:"南港展覽館",p:"5月中"}],
+"2026-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館",p:"6/2~6/5"}],
+"2026-07":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],
+"2026-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會",v:"世貿一館",p:"8/14~8/17"}],
+"2026-09":[{n:"SEMICON Taiwan 國際半導體展",v:"南港展覽館1&2館",p:"9/2~9/4"}],
+"2026-10":[{n:"ART TAIPEI 台北國際藝術博覽會（預估）",v:"世貿一館",p:"10月下旬"}],
+"2026-11":[{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"},{n:"北美館特展（預估）",v:"臺北市立美術館",p:"10月底起"}],
+"2026-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}],
+"2027-01":[{n:"台北國際書展（預估）",v:"南港展覽館1館",p:"1月底~2月初"},{n:"故宮常設展",v:"國立故宮博物院",p:"常設展"}],
+"2027-02":[{n:"台北國際動漫節（預估）",v:"南港展覽館1館",p:"2月上旬"},{n:"台北燈節",v:"台北市區",p:"2月中"}],
+"2027-03":[{n:"TIMTOS 台北國際工具機展",v:"南港展覽館1&2館",p:"3/2~3/7"},{n:"TAIPEI CYCLE 台北國際自行車展（預估）",v:"南港展覽館1&2館",p:"3月下旬"}],
+"2027-04":[{n:"台北國際汽機車零配件展（預估）",v:"南港展覽館1館",p:"4月中"}],
+"2027-05":[{n:"台北當代藝術博覽會（預估）",v:"南港展覽館",p:"5月中"},{n:"ATLife 臺灣輔具暨長照展（預估）",v:"南港展覽館1館",p:"5月中"}],
+"2027-06":[{n:"COMPUTEX 台北國際電腦展（預估）",v:"南港展覽館1&2館",p:"6月上旬"}],
+"2027-07":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],
+"2027-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會（預估）",v:"世貿一館",p:"8月中"},{n:"台北新藝術博覽會（預估）",v:"松山文創園區",p:"8月下旬"}],
+"2027-09":[{n:"SEMICON Taiwan 國際半導體展（預估）",v:"南港展覽館1&2館",p:"9月上旬"},{n:"台北國際自動化展（預估）",v:"南港展覽館1&2館",p:"9月"}],
+"2027-10":[{n:"ART TAIPEI 台北國際藝術博覽會（預估）",v:"世貿一館",p:"10月下旬"}],
+"2027-11":[{n:"第15屆台北雙年展（預估）",v:"臺北市立美術館",p:"11月起"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"}],
+"2027-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}]
+};
+
+const WD={
+"2026-05":[1,4,6,7,10,11,13,16,18,20,21,24,25,27,30],
+"2026-06":[1,2,5,6,8,11,13,14,15,16,19,20,22,25,27,28],
+"2026-07":[1,2,4,7,9,10,13,15,16,18,21,23,24,27,28,30],
+"2026-08":[2,3,5,8,10,11,14,15,17,20,22,24,26,27,29],
+"2026-09":[1,2,5,7,8,11,13,14,17,19,20,23,25,26,29],
+"2026-10":[1,3,6,8,10,11,14,17,19,20,23,25,26,29,31],
+"2026-11":[1,2,5,7,8,11,13,14,17,19,20,22,25,26,29],
+"2026-12":[1,2,4,7,8,10,13,14,16,19,20,22,25,26,28,31],
+"2027-01":[2,5,6,15,17,23,24,31],"2027-02":[6,9,14,17,20,21,26],
+"2027-03":[4,5,6,8,10,11,13,16,17,18,23,28,29],
+"2027-04":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],
+"2027-05":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],
+"2027-06":[5,9,10,11,12,18,19,21,24,27],
+"2027-07":[3,5,7,9,11,15,17,19,21,23,27,29,31],
+"2027-08":[2,5,8,10,14,17,20,22,26,29],
+"2027-09":[1,3,7,9,12,15,19,21,24,27],
+"2027-10":[1,3,6,9,12,15,18,21,24,27,30],
+"2027-11":[2,5,8,12,14,17,20,23,26,29],
+"2027-12":[3,5,8,12,16,19,22,27,28]
+};
+
+const CO={
+"2026-05":[{n:"EXO 演唱會",v:"台北小巨蛋",p:"5/9~5/10"},{n:"孫燕姿「日落以後」演唱會",v:"台北大巨蛋",p:"5/15、5/17"}],
+"2026-06":[{n:"鄧紫棋 I AM GLORIA 世界巡迴 2.0",v:"台北大巨蛋",p:"日期見售票平台"}]
+};
+const CTBD=[{n:"YOASOBI ASIA 10-CITY DOME & STADIUM TOUR",v:"台北大巨蛋（預計）",p:"2026-2027 日期待公布"}];
+
+const FC={holiday:"#e74c3c",wedding:"#e91e8e",exhibition:"#2980b9",concert:"#8e44ad"};
+
+let state={si:0,sd:null,f:{holiday:true,wedding:true,exhibition:true,concert:true}};
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function render(){
+const{si,sd,f}=state;
+const{y:year,m:month}=ML[si];
+const dm=dim(year,month),f1=fdm(year,month);
+const mEx=(EX[mk(year,month)]||[]);
+const mCo=(CO[mk(year,month)]||[]);
+const sH=sd?H[dk(year,month,sd)]:null;
+const sW=sd&&(WD[mk(year,month)]||[]).includes(sd);
+
+let html=`<div class="header">
+<h1>2026–2027 年曆</h1>
+<p>2026 丙午馬年 → 2027 丁未羊年（雙春年）</p>
+</div>`;
+
+// Filters
+html+=`<div class="filters">`;
+[{k:"holiday",l:"國定假日",c:FC.holiday,i:"🏮"},{k:"wedding",l:"宜嫁娶",c:FC.wedding,i:"💍"},{k:"exhibition",l:"展覽",c:FC.exhibition,i:"🎨"},{k:"concert",l:"演唱會",c:FC.concert,i:"🎤"}].forEach(x=>{
+const on=f[x.k];
+html+=`<button class="filter-btn" onclick="toggleF('${x.k}')" style="border-color:${x.c};background:${on?x.c:"transparent"};color:${on?"#fff":x.c}"><span>${x.i}</span>${x.l}</button>`;
+});
+html+=`</div>`;
+
+// Year tabs
+html+=`<div class="year-tabs">`;
+[2026,2027].forEach(y=>{
+const act=year===y;
+html+=`<button class="year-btn" onclick="setYear(${y})" style="border:${act?"2px solid #2c1810":"1px solid #c9b18a"};background:${act?"#2c1810":"transparent"};color:${act?"#fdf6ec":"#5a4230"}">${y}</button>`;
+});
+html+=`</div>`;
+
+// Month scroll
+html+=`<div class="month-scroll">`;
+ML.filter(m=>m.y===year).forEach(m=>{
+const gi=ML.indexOf(m),act=si===gi;
+html+=`<button class="month-btn" onclick="setMonth(${gi})" style="border:${act?"2px solid #2c1810":"1px solid #c9b18a"};background:${act?"#2c1810":"rgba(255,255,255,0.5)"};color:${act?"#fdf6ec":"#5a4230"};font-weight:${act?700:400}">${MN[m.m]}</button>`;
+});
+html+=`</div>`;
+
+// Calendar
+html+=`<div class="cal-wrap"><h2 class="cal-title">${year} ${MN[month]}</h2>`;
+html+=`<div class="cal-grid" style="margin-bottom:4px">`;
+W.forEach((w,i)=>{html+=`<div class="wk-hdr" style="color:${i===0||i===6?"#c0392b":"#8b6f47"}">${w}</div>`;});
+html+=`</div><div class="cal-grid">`;
+for(let i=0;i<f1;i++) html+=`<div></div>`;
+for(let d=1;d<=dm;d++){
+const hol=H[dk(year,month,d)];
+const wed=(WD[mk(year,month)]||[]).includes(d);
+const dow=new Date(year,month,d).getDay();
+const we=dow===0||dow===6;
+const sel=sd===d;
+const sHol=f.holiday&&hol;
+const sWed=f.wedding&&wed;
+let bg="transparent",tc=we?"#c0392b":"#2c1810",bd="2px solid transparent";
+if(sHol){bg="rgba(231,76,60,0.12)";tc="#c0392b";}
+if(sel){bd="2px solid #2c1810";bg="#2c1810";tc="#fdf6ec";}
+html+=`<button class="day-cell" onclick="setDay(${d})" style="border:${bd};background:${bg};color:${tc};font-weight:${hol?800:500}">${d}<div class="dots">`;
+if(sHol) html+=`<span class="dot" style="background:${sel?"#ff6b6b":FC.holiday}"></span>`;
+if(sWed) html+=`<span class="dot" style="background:${sel?"#ff69b4":FC.wedding}"></span>`;
+html+=`</div></button>`;
+}
+html+=`</div></div>`;
+
+// Selected day info
+if(sd){
+html+=`<div class="panel" style="background:rgba(255,255,255,0.7);box-shadow:0 2px 12px rgba(44,24,16,0.06)">
+<h3 style="color:#2c1810;font-size:16px;letter-spacing:2px">${year}/${month+1}/${sd} <span style="font-size:13px;color:#8b6f47;margin-left:8px">${W[new Date(year,month,sd).getDay()]}</span></h3>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">`;
+if(sH) html+=`<div class="badge" style="background:rgba(231,76,60,0.1);color:#c0392b">🏮 ${esc(sH)}</div>`;
+if(sW) html+=`<div class="badge" style="background:rgba(233,30,142,0.1);color:#e91e8e">💍 宜嫁娶</div>`;
+if(!sH&&!sW) html+=`<p style="color:#8b6f47;font-size:13px">無特殊事項</p>`;
+html+=`</div></div>`;
+}
+
+// Exhibition panel
+if(f.exhibition&&mEx.length>0){
+html+=`<div class="panel" style="background:rgba(41,128,185,0.06);border:1px solid rgba(41,128,185,0.2)">
+<h3 style="color:#2980b9">🎨 ${MN[month]}展覽</h3>`;
+mEx.forEach((ex,i)=>{
+const last=i===mEx.length-1;
+html+=`<div class="panel-item" style="${last?"margin:0;padding:0;border:none":"border-bottom:1px solid rgba(41,128,185,0.12)"}">
+<div style="font-weight:700;color:#1a5276;font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${esc(ex.n)}${ex.v.includes("南港")?`<span class="tag" style="background:#1abc9c">南港展覽館</span>`:""}</div>
+<div style="font-size:12px;color:#5d7d8f;margin-top:2px">📍 ${esc(ex.v)} ・ ${esc(ex.p)}</div></div>`;
+});
+html+=`</div>`;
+}
+
+// Concert panel
+if(f.concert&&(mCo.length>0||CTBD.length>0)){
+html+=`<div class="panel" style="background:rgba(142,68,173,0.06);border:1px solid rgba(142,68,173,0.2)">
+<h3 style="color:#8e44ad">🎤 ${mCo.length>0?MN[month]+"演唱會":"演唱會動態"}</h3>`;
+mCo.forEach(c=>{
+html+=`<div class="panel-item" style="border-bottom:1px solid rgba(142,68,173,0.12)">
+<div style="font-weight:700;color:#6c3483;font-size:14px">${esc(c.n)}</div>
+<div style="font-size:12px;color:#7d6b8a;margin-top:2px">📍 ${esc(c.v)} ・ ${esc(c.p)}</div></div>`;
+});
+CTBD.forEach(c=>{
+html+=`<div style="margin-top:4px">
+<div style="font-weight:700;color:#6c3483;font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${esc(c.n)}<span class="tag" style="background:#f39c12">日期待公布</span></div>
+<div style="font-size:12px;color:#7d6b8a;margin-top:2px">📍 ${esc(c.v)} ・ ${esc(c.p)}</div></div>`;
+});
+html+=`</div>`;
+}
+
+// Wedding panel
+const wd=WD[mk(year,month)];
+if(f.wedding&&wd&&wd.length>0){
+html+=`<div class="panel" style="background:rgba(233,30,142,0.04);border:1px solid rgba(233,30,142,0.15)">
+<h3 style="color:#e91e8e">💍 ${MN[month]}宜嫁娶吉日</h3>
+<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
+wd.forEach(d=>{
+const dn=W[new Date(year,month,d).getDay()];
+const sel2=sd===d;
+html+=`<span class="wed-chip" onclick="setDay(${d})" style="background:${sel2?"#e91e8e":"rgba(233,30,142,0.1)"};color:${sel2?"#fff":"#c0176e"}">${d}日（${dn}）</span>`;
+});
+html+=`</div></div>`;
+}
+
+// Footer
+html+=`<div class="footer">
+<p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本，預計2026年6月公布</p>
+<p>結婚吉日依農曆黃曆「宜嫁娶」標註，實際擇日建議參考專業命理師</p>
+<p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p>
+</div>`;
+
+document.getElementById("app").innerHTML=html;
+}
+
+function toggleF(k){state.f[k]=!state.f[k];render();}
+function setYear(y){state.si=ML.findIndex(m=>m.y===y);state.sd=null;render();}
+function setMonth(i){state.si=i;state.sd=null;render();}
+function setDay(d){state.sd=state.sd===d?null:d;render();}
+
+render();
+</script>
+</body>
+</html>
