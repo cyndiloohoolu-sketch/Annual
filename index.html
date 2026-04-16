@@ -110,7 +110,7 @@ const wd=WD[mk(yr,mo)];
 if(f.wedding&&wd&&wd.length>0){
 h+=`<div class="pn" style="background:rgba(233,30,142,0.04);border:1px solid rgba(233,30,142,0.15)"><h3 style="color:#e91e8e">💍 ${MN[mo]}宜嫁娶吉日</h3><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
 wd.forEach(d=>{const dn=W[new Date(yr,mo,d).getDay()],s2=sd===d;h+=`<span class="wc" onclick="sD(${d})" style="background:${s2?"#e91e8e":"rgba(233,30,142,0.1)"};color:${s2?"#fff":"#c0176e"}">${d}日（${dn}）</span>`;});h+=`</div></div>`;}
-h+=`<div class="ft"><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
+h+=`<div class="ft"><p>最後更新：2026年4月16日</p><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
 document.getElementById("app").innerHTML=h;}
 function tf(k){S.f[k]=!S.f[k];render();}
 function sY(y){S.si=ML.findIndex(m=>m.y===y);S.sd=null;render();}
