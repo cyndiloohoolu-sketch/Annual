@@ -169,7 +169,7 @@ function renderWoW(yr, mo) {
     const dt = new Date(yr, mo, d);
     const isFuture = dt > today;
     const color = isFuture ? 'rgba(201,177,138,0.25)' :
-                  occ >= 80 ? '#27ae60' : occ >= 50 ? '#f39c12' : occ > 0 ? '#e74c3c' : 'rgba(201,177,138,0.3)';
+                  occ >= 80 ? '#e74c3c' : occ >= 50 ? '#f39c12' : occ > 0 ? '#27ae60' : 'rgba(201,177,138,0.3)';
     const isLastWeekEnd = d === lastWeekCutoff;
     const isThisWeekEnd = d === cutoffDay;
     bars += '<div title="'+d+'日 '+occ+'%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;position:relative">'+
@@ -201,18 +201,7 @@ function renderWoW(yr, mo) {
         '<div class="wow-sub">上週截止 '+(lastWeekStats.days > 0 ? fmtRev(lastWeekStats.rev) : '—')+'</div>'+
         pctTag(revPct, lastWeekStats.rev > 0)+
       '</div>'+
-      '<div class="wow-card">'+
-        '<div class="wow-label">vs '+lastMoName+'同期 OCC</div>'+
-        '<div class="wow-value">'+(thisWeekStats.days > 0 ? thisWeekStats.occ.toFixed(1)+'%' : '—')+'</div>'+
-        '<div class="wow-sub">'+lastMoName+' '+(lastMonthStats.days > 0 ? lastMonthStats.occ.toFixed(1)+'%' : '—')+'</div>'+
-        pctTag(lastMonthStats.occ > 0 ? (thisWeekStats.occ - lastMonthStats.occ)/lastMonthStats.occ*100 : 0, lastMonthStats.days > 0)+
-      '</div>'+
-      '<div class="wow-card">'+
-        '<div class="wow-label">vs '+lastMoName+'同期房租</div>'+
-        '<div class="wow-value">'+(thisWeekStats.days > 0 ? fmtRev(thisWeekStats.rev) : '—')+'</div>'+
-        '<div class="wow-sub">'+lastMoName+' '+(lastMonthStats.days > 0 ? fmtRev(lastMonthStats.rev) : '—')+'</div>'+
-        pctTag(lastMonthStats.rev > 0 ? (thisWeekStats.rev - lastMonthStats.rev)/lastMonthStats.rev*100 : 0, lastMonthStats.days > 0)+
-      '</div>'+
+
     '</div>'+
     '<div style="margin-top:14px">'+
       '<div class="wow-bar-label">'+MN2[mo]+'月每日 OCC（綠≥80% 橘≥50% 紅<50% 灰=預測）</div>'+
@@ -222,7 +211,7 @@ function renderWoW(yr, mo) {
 }
 
 function fmtRev(n){if(n>=1000000)return(n/1000000).toFixed(1)+"M";if(n>=10000)return Math.round(n/1000)+"K";return n.toLocaleString();}
-function occColor(o){if(o>=80)return"rgba(39,174,96,0.25)";if(o>=50)return"rgba(39,174,96,0.12)";if(o>=20)return"rgba(241,196,15,0.12)";if(o>0)return"rgba(231,76,60,0.08)";return"transparent";}
+function occColor(o){if(o>=80)return"rgba(231,76,60,0.25)";if(o>=50)return"rgba(241,196,15,0.12)";if(o>=20)return"rgba(39,174,96,0.12)";if(o>0)return"rgba(39,174,96,0.08)";return"transparent";}
 
 let S={si:0,sd:null,f:{holiday:true,wedding:true,exhibition:true,concert:true,occ:true}};
 window.render=function render(){
@@ -251,7 +240,7 @@ if(showOcc&&od[0]>0)bg=occColor(od[0]);
 if(sHol){bg="rgba(231,76,60,0.18)";tc="#c0392b";}
 if(sel){bd="2px solid #2c1810";bg="#2c1810";tc="#fdf6ec";}
 h+=`<button class="dc" onclick="sD(${d})" style="border:${bd};background:${bg};color:${tc};font-weight:${hol?800:500}">${d}`;
-if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,.7)":od[0]>=50?"#27ae60":"#e67e22"}">${od[0]}%</span>`;
+if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,.7)":od[0]>=80?"#e74c3c":od[0]>=50?"#e67e22":"#27ae60"}">${od[0]}%</span>`;
 h+=`<div class="dots">`;
 if(sHol)h+=`<span class="dot" style="background:${sel?"#ff6b6b":FC.holiday}"></span>`;
 if(sWed)h+=`<span class="dot" style="background:${sel?"#ff69b4":FC.wedding}"></span>`;
