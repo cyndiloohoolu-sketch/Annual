@@ -96,165 +96,134 @@ function renderWoW(yr, mo) {
   const MN2 = ["一","二","三","四","五","六","七","八","九","十","十一","十二"];
   const daysInMonth = new Date(yr, mo+1, 0).getDate();
   const today = new Date(); today.setHours(0,0,0,0);
+  const mk2 = yr+'-'+String(mo+1).padStart(2,'0');
+  const budget = typeof BUDGET !== 'undefined' ? BUDGET[mk2] : null;
 
-  // Get all days in this month that have OD data
-  function getMonthData(y, m) {
-    const dim = new Date(y, m+1, 0).getDate();
-    const result = [];
-    for (let d = 1; d <= dim; d++) {
-      const ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-      const od = window.OD[ds];
-      if (od) result.push({ ds, occ: od[0], rev: od[1], day: d });
-    }
-    return result;
-  }
-
-  // Cumulative avg OCC and total rev up to day N (inclusive)
-  function cumUpToDay(data, maxDay) {
+  // Full month on-hand: sum ALL days (past actual + future predictions)
+  function fullMonthOnHand() {
     let occSum = 0, occCount = 0, rev = 0;
-    data.forEach(row => {
-      if (row.day <= maxDay) {
-        if (row.occ > 0) { occSum += row.occ; occCount++; }
-        rev += row.rev;
-      }
-    });
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds = mk2+'-'+String(d).padStart(2,'0');
+      const od = window.OD[ds];
+      if (od) { rev += od[1]; if (od[0] > 0) { occSum += od[0]; occCount++; } }
+    }
     return { occ: occCount > 0 ? occSum/occCount : 0, rev, days: occCount };
   }
 
-  const thisMonthData = getMonthData(yr, mo);
-  const lastMo = mo === 0 ? 11 : mo - 1;
-  const lastMoYr = mo === 0 ? yr - 1 : yr;
-  const lastMonthData = getMonthData(lastMoYr, lastMo);
+  // Last week snapshot: stored in localStorage as previous upload
+  const lsKey = 'wow_prev_'+mk2;
+  let prevSnapshot = null;
+  try { prevSnapshot = JSON.parse(localStorage.getItem(lsKey)); } catch(e) {}
 
-  // Find "this week cutoff" and "last week cutoff" within the month
-  // This week cutoff = last day with OD data in this month (or today if current month)
-  // Last week cutoff = 7 days before that
-  let cutoffDay;
-  const isCurrentMonth = yr === today.getFullYear() && mo === today.getMonth();
-  const isFutureMonth = new Date(yr, mo, 1) > today;
+  // Save current snapshot for next week comparison (called after upload)
+  window.saveWoWSnapshot = function(yrm) {
+    const [y, m] = yrm.split('-').map(Number);
+    const mk = yrm;
+    const dim = new Date(y, m, 0).getDate();
+    let os = 0, oc = 0, rv = 0;
+    for (let d = 1; d <= dim; d++) {
+      const ds = mk+'-'+String(d).padStart(2,'0');
+      const od = window.OD[ds];
+      if (od) { rv += od[1]; if (od[0] > 0) { os += od[0]; oc++; } }
+    }
+    const snap = { occ: oc > 0 ? os/oc : 0, rev: rv, savedAt: new Date().toISOString() };
+    localStorage.setItem('wow_prev_'+mk, JSON.stringify(snap));
+  };
 
-  if (isCurrentMonth) {
-    cutoffDay = today.getDate();
-  } else if (isFutureMonth) {
-    // Future month: use whatever data exists (predictions)
-    cutoffDay = daysInMonth;
-  } else {
-    // Past month: use last day
-    cutoffDay = daysInMonth;
-  }
+  const curr = fullMonthOnHand();
 
-  const lastWeekCutoff = Math.max(1, cutoffDay - 7);
-
-  const thisWeekStats = cumUpToDay(thisMonthData, cutoffDay);
-  const lastWeekStats = cumUpToDay(thisMonthData, lastWeekCutoff);
-
-  // Same cutoff day for last month comparison
-  const lastMoDim = new Date(lastMoYr, lastMo+1, 0).getDate();
-  const lastMoCutoff = Math.min(cutoffDay, lastMoDim);
-  const lastMonthStats = cumUpToDay(lastMonthData, lastMoCutoff);
-  const lastMonthLastWeek = cumUpToDay(lastMonthData, Math.max(1, lastMoCutoff - 7));
-
-  const occDiff = thisWeekStats.occ - lastWeekStats.occ;
-  const revPct = lastWeekStats.rev > 0 ? ((thisWeekStats.rev - lastWeekStats.rev) / lastWeekStats.rev * 100) : 0;
+  // WoW diff vs last saved snapshot
+  const occDiff = prevSnapshot ? curr.occ - prevSnapshot.occ : null;
+  const revDiff = prevSnapshot ? curr.rev - prevSnapshot.rev : null;
+  const revPct = (prevSnapshot && prevSnapshot.rev > 0) ? (curr.rev - prevSnapshot.rev) / prevSnapshot.rev * 100 : null;
 
   function ppTag(diff) {
-    if (lastWeekStats.days === 0) return '';
+    if (diff === null) return '<span class="wow-change wow-flat">— 尚無上週資料</span>';
     const cls = diff > 0.5 ? 'wow-up' : diff < -0.5 ? 'wow-down' : 'wow-flat';
     const arrow = diff > 0.5 ? '▲' : diff < -0.5 ? '▼' : '—';
     const sign = diff >= 0 ? '+' : '';
     return '<span class="wow-change '+cls+'">'+arrow+' '+sign+diff.toFixed(1)+' pp</span>';
   }
 
-  function pctTag(pct, hasBase) {
-    if (!hasBase) return '';
+  function pctTag(pct) {
+    if (pct === null) return '<span class="wow-change wow-flat">— 尚無上週資料</span>';
     const cls = pct > 1 ? 'wow-up' : pct < -1 ? 'wow-down' : 'wow-flat';
     const arrow = pct > 1 ? '▲' : pct < -1 ? '▼' : '—';
     const sign = pct >= 0 ? '+' : '';
     return '<span class="wow-change '+cls+'">'+arrow+' '+sign+pct.toFixed(1)+'%</span>';
   }
 
-  // Monthly bar chart - all days
+  const prevDate = prevSnapshot ? prevSnapshot.savedAt.slice(0,10) : null;
+
+  // Bar chart
   let bars = '';
   for (let d = 1; d <= daysInMonth; d++) {
-    const ds = yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const ds = mk2+'-'+String(d).padStart(2,'0');
     const od = window.OD[ds];
     const occ = od ? od[0] : 0;
-    const dt = new Date(yr, mo, d);
-    const isFuture = dt > today;
+    const isFuture = new Date(yr, mo, d) > today;
     const color = isFuture ? 'rgba(201,177,138,0.25)' :
                   occ >= 80 ? '#e74c3c' : occ >= 50 ? '#f39c12' : occ > 0 ? '#27ae60' : 'rgba(201,177,138,0.3)';
-    const isLastWeekEnd = d === lastWeekCutoff;
-    const isThisWeekEnd = d === cutoffDay;
-    bars += '<div title="'+d+'日 '+occ+'%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;position:relative">'+
-      (isLastWeekEnd ? '<div style="position:absolute;top:0;right:0;width:2px;height:100%;background:rgba(139,111,71,0.4);border-radius:1px"></div>' : '')+
-      (isThisWeekEnd ? '<div style="position:absolute;top:0;right:0;width:2px;height:100%;background:#2c1810;border-radius:1px"></div>' : '')+
+    bars += '<div title="'+d+'日 '+occ+'%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">'+
       '<div style="width:100%;border-radius:2px 2px 0 0;background:'+color+';height:'+Math.max(occ*0.55,2)+'px;transition:height .3s"></div>'+
       (d % 5 === 1 ? '<span style="font-size:8px;color:#b09a7a">'+d+'</span>' : '<span style="font-size:8px;color:transparent">·</span>')+
     '</div>';
   }
 
-  const labelPeriod = isCurrentMonth ? '截至今日第'+cutoffDay+'天' : isFutureMonth ? '預測值' : '全月';
-  const lastMoName = MN2[lastMo]+'月';
+  // Budget bars
+  const budgetHtml = budget ? (() => {
+    const occTarget = budget[0], revTarget = budget[1];
+    const occPct = Math.min(curr.occ/occTarget*100, 120);
+    const revPct2 = Math.min(curr.rev/revTarget*100, 120);
+    const occColor = curr.occ >= occTarget ? '#e74c3c' : curr.occ >= occTarget*0.9 ? '#f39c12' : '#27ae60';
+    const revColor = curr.rev >= revTarget ? '#e74c3c' : curr.rev >= revTarget*0.9 ? '#f39c12' : '#27ae60';
+    return '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(201,177,138,0.3)">'+
+      '<div class="wow-bar-label" style="margin-bottom:8px">📊 Budget 達成率</div>'+
+      '<div style="margin-bottom:10px">'+
+        '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
+          '<span style="color:#8b6f47">OCC 目標 '+occTarget+'%</span>'+
+          '<span style="font-weight:700;color:'+occColor+'">'+curr.occ.toFixed(1)+'% / '+occTarget+'%</span>'+
+        '</div>'+
+        '<div style="background:rgba(201,177,138,0.2);border-radius:6px;height:10px;overflow:hidden">'+
+          '<div style="height:100%;border-radius:6px;background:'+occColor+';width:'+Math.min(occPct,100)+'%;transition:width .5s"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
+          '<span style="color:#8b6f47">房租目標 '+fmtRev(revTarget)+'</span>'+
+          '<span style="font-weight:700;color:'+revColor+'">'+fmtRev(curr.rev)+' / '+fmtRev(revTarget)+'</span>'+
+        '</div>'+
+        '<div style="background:rgba(201,177,138,0.2);border-radius:6px;height:10px;overflow:hidden">'+
+          '<div style="height:100%;border-radius:6px;background:'+revColor+';width:'+Math.min(revPct2,100)+'%;transition:width .5s"></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  })() : '';
 
   return '<div class="wow-panel">'+
-    '<div class="wow-title">📈 '+MN2[mo]+'月 月累計 WoW</div>'+
+    '<div class="wow-title">📈 '+MN2[mo]+'月 全月 On-Hand WoW</div>'+
     '<div style="font-size:10px;color:#b09a7a;margin:-6px 0 12px">'+
-      '本週（前'+cutoffDay+'天）vs 上週（前'+lastWeekCutoff+'天）'+
+      '本週全月 On-Hand vs '+(prevDate ? '上週 '+prevDate : '上傳新 Excel 後自動記錄上週基準')+
     '</div>'+
     '<div class="wow-grid">'+
       '<div class="wow-card">'+
-        '<div class="wow-label">本週截止 月均 OCC</div>'+
-        '<div class="wow-value">'+(thisWeekStats.days > 0 ? thisWeekStats.occ.toFixed(1)+'%' : '—')+'</div>'+
-        '<div class="wow-sub">上週截止 '+(lastWeekStats.days > 0 ? lastWeekStats.occ.toFixed(1)+'%' : '—')+'</div>'+
+        '<div class="wow-label">全月 On-Hand OCC</div>'+
+        '<div class="wow-value">'+(curr.days > 0 ? curr.occ.toFixed(1)+'%' : '—')+'</div>'+
+        '<div class="wow-sub">'+(prevSnapshot ? '上週 '+prevSnapshot.occ.toFixed(1)+'%' : '尚無上週基準')+'</div>'+
         ppTag(occDiff)+
       '</div>'+
       '<div class="wow-card">'+
-        '<div class="wow-label">本週截止 月累計房租</div>'+
-        '<div class="wow-value">'+(thisWeekStats.days > 0 ? fmtRev(thisWeekStats.rev) : '—')+'</div>'+
-        '<div class="wow-sub">上週截止 '+(lastWeekStats.days > 0 ? fmtRev(lastWeekStats.rev) : '—')+'</div>'+
-        pctTag(revPct, lastWeekStats.rev > 0)+
+        '<div class="wow-label">全月 On-Hand 房租</div>'+
+        '<div class="wow-value">'+(curr.rev > 0 ? fmtRev(curr.rev) : '—')+'</div>'+
+        '<div class="wow-sub">'+(prevSnapshot ? '上週 '+fmtRev(prevSnapshot.rev) : '尚無上週基準')+'</div>'+
+        pctTag(revPct)+
       '</div>'+
-
     '</div>'+
     '<div style="margin-top:14px">'+
-      '<div class="wow-bar-label">'+MN2[mo]+'月每日 OCC（綠≥80% 橘≥50% 紅<50% 灰=預測）</div>'+
+      '<div class="wow-bar-label">'+MN2[mo]+'月每日 OCC（深色=實際 淺色=預測）</div>'+
       '<div style="display:flex;align-items:flex-end;gap:1px;height:65px;margin-top:6px">'+bars+'</div>'+
     '</div>'+
-    (budget ? (
-      '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(201,177,138,0.3)">'+
-        '<div class="wow-bar-label" style="margin-bottom:8px">📊 Budget 達成率</div>'+
-        (() => {
-          const occActual = thisWeekStats.occ;
-          const occTarget = budget[0];
-          const occPct = occTarget > 0 ? Math.min(occActual/occTarget*100,120) : 0;
-          const occColor = occActual >= occTarget ? "#e74c3c" : occActual >= occTarget*0.9 ? "#f39c12" : "#27ae60";
-          const revActual = thisWeekStats.rev;
-          const revTarget = budget[1];
-          const revPct2 = revTarget > 0 ? Math.min(revActual/revTarget*100,120) : 0;
-          const revColor = revActual >= revTarget ? "#e74c3c" : revActual >= revTarget*0.9 ? "#f39c12" : "#27ae60";
-          return (
-            '<div style="margin-bottom:10px">'+
-              '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
-                '<span style="color:#8b6f47">月均 OCC 目標 '+occTarget+'%</span>'+
-                '<span style="font-weight:700;color:'+occColor+'">'+occActual.toFixed(1)+'% / '+occTarget+'%</span>'+
-              '</div>'+
-              '<div style="background:rgba(201,177,138,0.2);border-radius:6px;height:10px;overflow:hidden">'+
-                '<div style="height:100%;border-radius:6px;background:'+occColor+';width:'+Math.min(occPct,100)+'%;transition:width .5s"></div>'+
-              '</div>'+
-            '</div>'+
-            '<div>'+
-              '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
-                '<span style="color:#8b6f47">全月房租目標 '+fmtRev(revTarget)+'</span>'+
-                '<span style="font-weight:700;color:'+revColor+'">'+fmtRev(revActual)+' / '+fmtRev(revTarget)+'</span>'+
-              '</div>'+
-              '<div style="background:rgba(201,177,138,0.2);border-radius:6px;height:10px;overflow:hidden">'+
-                '<div style="height:100%;border-radius:6px;background:'+revColor+';width:'+Math.min(revPct2,100)+'%;transition:width .5s"></div>'+
-              '</div>'+
-            '</div>'
-          );
-        })() +
-      '</div>'
-    ) : '')+
+    budgetHtml+
   '</div>';
 }
 
@@ -452,7 +421,11 @@ window.handleExcelUpload = async function(input) {
     Object.assign(window.OD, newOD);
     window.render();
     console.log("✅ Uploaded", count, "entries. Sample keys:", Object.keys(newOD).slice(0,5));
-    statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！";
+    // Save WoW snapshot BEFORE merging new data (this becomes "last week" baseline)
+    // Save current state of each month as previous snapshot
+    const months = [...new Set(Object.keys(window.OD).map(k => k.slice(0,7)))];
+    months.forEach(mk => { if (window.saveWoWSnapshot) window.saveWoWSnapshot(mk); });
+    statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！已記錄本週基準";
     statusEl.style.color = "#27ae60";
     input.value = "";
   } catch(e) {
