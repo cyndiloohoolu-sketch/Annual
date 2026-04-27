@@ -339,15 +339,6 @@ window.handleExcelUpload = async function(input) {
 
     const newOD = {};
     let count = 0;
-    // Debug: show first 3 data rows
-    const debugInfo = [];
-    for (let di = 6; di < Math.min(10, rows.length); di++) {
-      const r = rows[di];
-      debugInfo.push('row'+di+': col0='+JSON.stringify(r[0])+' col3='+JSON.stringify(r[3])+' col8='+JSON.stringify(r[8]));
-    }
-    statusEl.textContent = '🔍 Debug: ' + debugInfo.join(' | ');
-    await new Promise(r => setTimeout(r, 5000)); // show for 5 seconds
-
     for (let i = 6; i < rows.length; i++) {
       const row = rows[i];
       if (!row[0]) continue;
@@ -382,7 +373,8 @@ window.handleExcelUpload = async function(input) {
       return;
     }
 
-    statusEl.textContent = "⬆️ 上傳中...";
+    statusEl.textContent = "✅ 讀取完成 " + count + " 筆，上傳中...";
+    statusEl.style.color = "#f39c12";
     await window.uploadToFirestore(newOD);
     Object.assign(window.OD, newOD);
     window.render();
@@ -390,9 +382,16 @@ window.handleExcelUpload = async function(input) {
     statusEl.style.color = "#27ae60";
     input.value = "";
   } catch(e) {
-    statusEl.textContent = "❌ 錯誤：" + e.message;
+    const msg = e.message || String(e);
+    if (msg.includes('permission') || msg.includes('PERMISSION')) {
+      statusEl.textContent = "❌ Firebase 權限錯誤：請先到 Firestore Console 更新 Rules";
+    } else if (msg.includes('network') || msg.includes('fetch')) {
+      statusEl.textContent = "❌ 網路錯誤：請確認網路連線";
+    } else {
+      statusEl.textContent = "❌ 錯誤：" + msg;
+    }
     statusEl.style.color = "#e74c3c";
-    console.error(e);
+    console.error("Upload error:", e);
   }
 };
 
