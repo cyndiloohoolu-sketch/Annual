@@ -284,12 +284,25 @@ async function loadFirestoreOCC() {
   try {
     const snap = await getDocs(collection(db, "occ_data"));
     if (!snap.empty) {
+      let totalKeys = 0;
       snap.forEach(docSnap => {
         const data = docSnap.data();
-        Object.assign(window.OD, data);
+        // Firestore may return keys in any format - ensure they match YYYY-MM-DD
+        Object.entries(data).forEach(([k, v]) => {
+          // Normalize key: ensure format is YYYY-MM-DD
+          let key = k;
+          if (/^\d{8}$/.test(k)) {
+            // Convert 20260401 -> 2026-04-01
+            key = k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);
+          }
+          window.OD[key] = v;
+          totalKeys++;
+        });
       });
+      console.log("✅ Firestore OCC loaded:", totalKeys, "entries, sample:", Object.keys(window.OD).slice(0,3));
       window.render();
-      console.log("✅ Firestore OCC data loaded");
+    } else {
+      console.log("ℹ️ Firestore OCC: no data found");
     }
   } catch(e) {
     console.warn("Firestore load failed:", e);
@@ -378,6 +391,7 @@ window.handleExcelUpload = async function(input) {
     await window.uploadToFirestore(newOD);
     Object.assign(window.OD, newOD);
     window.render();
+    console.log("✅ Uploaded", count, "entries. Sample keys:", Object.keys(newOD).slice(0,5));
     statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！";
     statusEl.style.color = "#27ae60";
     input.value = "";
