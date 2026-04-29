@@ -268,6 +268,56 @@ function renderWoW(yr, mo) {
     '</div>';
   }
 
+  // Pick up needed calculation
+  const today2 = new Date(); today2.setHours(0,0,0,0);
+  const isCurrentMonth2 = yr === today2.getFullYear() && mo === today2.getMonth();
+  const isPastMonth = new Date(yr, mo+1, 0) < today2;
+  let pickupHtml = '';
+  if (budget) {
+    // Remaining days: for current month = today onwards, future = full month, past = 0
+    let remainingDays = 0;
+    if (isCurrentMonth2) {
+      // Current month: today to end of month
+      remainingDays = daysInMonth - today2.getDate() + 1;
+    } else if (!isPastMonth) {
+      // Future month: today to end of THAT month (includes remaining current month days)
+      const endOfThatMonth = new Date(yr, mo+1, 0);
+      const diffMs = endOfThatMonth - today2;
+      remainingDays = Math.ceil(diffMs / 86400000) + 1;
+    }
+
+    const occGap = budget[0] - curr.occ;
+    const revGap = budget[1] - curr.rev;
+    const dailyRevPickup = remainingDays > 0 ? revGap / remainingDays : 0;
+
+    const occNeedColor = occGap <= 0 ? '#20c997' : occGap > 15 ? '#dc3545' : '#fd7e14';
+    const revNeedColor = revGap <= 0 ? '#20c997' : revGap > budget[1]*0.2 ? '#dc3545' : '#fd7e14';
+
+    const remainingLabel = isPastMonth ? '已結束' :
+                           isCurrentMonth2 ? '本月剩餘 '+remainingDays+' 天' :
+                           '今天起共 '+remainingDays+' 天';
+
+    pickupHtml = '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">' +
+      '<div class="wow-bar-label" style="margin-bottom:10px">🎯 Pick Up 目標（' + remainingLabel + '）</div>' +
+      '<div class="wow-grid">' +
+        '<div class="wow-card">' +
+          '<div class="wow-label">' + (isPastMonth ? '最終 OCC 缺口' : '需提升 OCC') + '</div>' +
+          '<div class="wow-value" style="font-size:18px;color:' + occNeedColor + '">' +
+            (occGap <= 0 ? '已達標 ✓' : '+' + occGap.toFixed(1) + ' pp') +
+          '</div>' +
+          '<div class="wow-sub">' + (occGap <= 0 ? '超出 '+Math.abs(occGap).toFixed(1)+' pp' : '目標 '+budget[0]+'%，現 '+curr.occ.toFixed(1)+'%') + '</div>' +
+        '</div>' +
+        '<div class="wow-card">' +
+          '<div class="wow-label">' + (isPastMonth ? '最終房租缺口' : remainingDays > 0 ? '每日需補房租' : '房租缺口') + '</div>' +
+          '<div class="wow-value" style="font-size:18px;color:' + revNeedColor + '">' +
+            (revGap <= 0 ? '已達標 ✓' : remainingDays > 0 ? '+'+fmtRev(Math.round(dailyRevPickup)) : fmtRev(Math.round(revGap))) +
+          '</div>' +
+          '<div class="wow-sub">' + (revGap <= 0 ? '超出 '+fmtRev(Math.abs(Math.round(revGap))) : '共缺 '+fmtRev(Math.round(revGap))) + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
   // Budget bars
   const budgetHtml = budget ? (() => {
     const occTarget = budget[0], revTarget = budget[1];
@@ -322,6 +372,7 @@ function renderWoW(yr, mo) {
       '<div style="display:flex;align-items:flex-end;gap:1px;height:65px;margin-top:6px">'+bars+'</div>'+
     '</div>'+
     budgetHtml+
+    pickupHtml+
   '</div>';
 }
 
