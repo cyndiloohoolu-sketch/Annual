@@ -258,12 +258,39 @@ let bg="transparent",tc=we?"#c0392b":"#2c1810",bd="2px solid transparent";
 if(showOcc&&od[0]>0)bg=occColor(od[0]);
 if(sHol){bg="rgba(231,76,60,0.18)";tc="#c0392b";}
 if(sel){bd="2px solid #2c1810";bg="#2c1810";tc="#fdf6ec";}
-h+=`<button class="dc" onclick="sD(${d})" style="border:${bd};background:${bg};color:${tc};font-weight:${hol?800:500}">${d}`;
+// Build event labels for this day
+const dayEx=(EX[mk(yr,mo)]||[]).filter(e=>{
+  if(!f.exhibition)return false;
+  const p=e.p||'';
+  const mn=mo+1;
+  // Check if day d falls within date range like "6/2~6/5"
+  const rangeM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);
+  if(rangeM){const[,sm,sd2,em,ed]=rangeM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}
+  const singleM=p.match(/(\d+)\/(\d+)/g);
+  if(singleM)return singleM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});
+  return false;
+});
+const dayCo=(CO[mk(yr,mo)]||[]).filter(e=>{
+  if(!f.concert)return false;
+  const p=e.p||'';
+  const mn=mo+1;
+  const rangeM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);
+  if(rangeM){const[,sm,sd2,em,ed]=rangeM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}
+  const singleM=p.match(/(\d+)\/(\d+)/g);
+  if(singleM)return singleM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});
+  return false;
+});
+h+=`<button class="dc" onclick="sD(${d})" style="border:${bd};background:${bg};color:${tc};font-weight:${hol?800:500};height:auto;min-height:52px;padding-bottom:3px">${d}`;
 if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,.7)":od[0]>=80?"#e74c3c":od[0]>=50?"#e67e22":"#27ae60"}">${od[0]}%</span>`;
-h+=`<div class="dots">`;
-if(sHol)h+=`<span class="dot" style="background:${sel?"#ff6b6b":FC.holiday}"></span>`;
-if(sWed)h+=`<span class="dot" style="background:${sel?"#ff69b4":FC.wedding}"></span>`;
-h+=`</div></button>`;}
+// Holiday name
+if(sHol)h+=`<span style="display:block;font-size:8px;line-height:1.2;margin-top:1px;color:${sel?"#ffaaaa":"#c0392b"};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">🏮${hol}</span>`;
+// Wedding
+if(sWed)h+=`<span style="display:block;font-size:8px;line-height:1.2;color:${sel?"#ffb6c1":FC.wedding}">💍宜嫁娶</span>`;
+// Exhibitions
+dayEx.forEach(e=>h+=`<span style="display:block;font-size:8px;line-height:1.2;margin-top:1px;color:${sel?"rgba(255,255,255,.8)":"#8b4513"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">🎨${e.n.replace(/（.*?）/g,'').replace(/台北國際/g,'').replace(/展覽會/g,'展').slice(0,8)}</span>`);
+// Concerts
+dayCo.forEach(e=>h+=`<span style="display:block;font-size:8px;line-height:1.2;margin-top:1px;color:${sel?"rgba(255,255,255,.8)":"#6a0dad"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">🎤${e.n.replace(/演唱會/g,'').replace(/巡迴/g,'').replace(/世界/g,'').slice(0,8)}</span>`);
+h+=`</button>`;}
 h+=`</div></div>`;
 h+=renderWoW(yr,mo);
 if(sd){
