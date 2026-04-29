@@ -7,57 +7,112 @@
 <meta name="description" content="2026-2027台灣互動式年曆，含國定假日、台北展覽、農曆宜嫁娶吉日、演唱會、住房率資訊">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap');
+
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Serif TC',serif;min-height:100vh;background:linear-gradient(135deg,#fdf6ec 0%,#f5e6d3 40%,#ede0d4 100%);padding:24px 16px;color:#2c1810}
+:root{
+  --bg:#f8f9fa;
+  --surface:#ffffff;
+  --surface2:#f1f3f5;
+  --border:#e9ecef;
+  --border2:#dee2e6;
+  --text-primary:#212529;
+  --text-secondary:#6c757d;
+  --text-muted:#adb5bd;
+  --accent:#1a1a2e;
+  --accent2:#16213e;
+  --red:#dc3545;
+  --orange:#fd7e14;
+  --green:#20c997;
+  --blue:#0d6efd;
+  --purple:#6f42c1;
+  --pink:#d63384;
+  --radius:8px;
+  --radius-lg:12px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg:0 10px 25px rgba(0,0,0,0.1),0 4px 10px rgba(0,0,0,0.05);
+}
+body{font-family:'Noto Sans TC','Inter',sans-serif;min-height:100vh;background:var(--bg);color:var(--text-primary);padding:0}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
-.header{text-align:center;margin-bottom:20px}
-.header h1{font-size:30px;font-weight:900;letter-spacing:6px}
-.header p{font-size:12px;color:#8b6f47;margin-top:6px;letter-spacing:3px;font-style:italic}
-.filters{display:flex;justify-content:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
-.fb{display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;transition:all .2s;border:2px solid}
-.yt{display:flex;justify-content:center;gap:8px;margin-bottom:10px}
-.yb{padding:6px 20px;border-radius:20px;font-size:15px;font-weight:700}
-.ms{display:flex;gap:5px;max-width:500px;margin:0 auto 16px;overflow-x:auto;padding-bottom:4px}
-.ms::-webkit-scrollbar{height:4px}.ms::-webkit-scrollbar-thumb{background:#c9b18a;border-radius:4px}
-.mb{padding:7px 0;min-width:46px;border-radius:8px;flex-shrink:0;font-size:13px;transition:all .2s}
-.cw{max-width:480px;margin:0 auto;background:rgba(255,255,255,.65);border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(44,24,16,.08);backdrop-filter:blur(8px)}
-.ct{text-align:center;font-size:20px;margin-bottom:12px;letter-spacing:4px}
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.wh{text-align:center;font-size:12px;font-weight:700;padding:4px 0}
-.dc{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:14px;transition:all .15s;padding:2px 0;border:2px solid transparent;position:relative;line-height:1.2}
-.dc:hover{transform:scale(1.06)}
-.dc .occ{font-size:8px;font-weight:600;opacity:.8;margin-top:1px}
-.dots{display:flex;gap:2px;margin-top:1px;min-height:5px}
-.dot{width:4px;height:4px;border-radius:50%;display:inline-block}
-.pn{max-width:480px;margin:16px auto 0;border-radius:12px;padding:14px 18px}
-.pn h3{margin:0 0 10px;font-size:15px;letter-spacing:2px;display:flex;align-items:center;gap:6px}
-.pi{margin-bottom:10px;padding-bottom:10px}
-.tg{font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600;white-space:nowrap;color:#fff}
-.bd{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:13px;font-weight:600}
-.wc{padding:4px 10px;border-radius:16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;margin:3px}
 
-.wow-panel{max-width:480px;margin:12px auto 0;background:rgba(255,255,255,0.75);border-radius:16px;padding:16px 18px;box-shadow:0 4px 20px rgba(44,24,16,0.08);backdrop-filter:blur(8px)}
-.wow-title{font-size:13px;font-weight:700;color:#5a4230;letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.wow-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.wow-card{background:rgba(253,246,236,0.8);border-radius:12px;padding:12px 14px;border:1px solid rgba(201,177,138,0.3)}
-.wow-label{font-size:10px;color:#8b6f47;letter-spacing:1px;margin-bottom:4px}
-.wow-value{font-size:20px;font-weight:900;color:#2c1810;letter-spacing:-0.5px}
-.wow-sub{font-size:11px;color:#8b6f47;margin-top:2px}
-.wow-change{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:6px}
-.wow-up{background:rgba(39,174,96,0.12);color:#27ae60}
-.wow-down{background:rgba(231,76,60,0.12);color:#c0392b}
-.wow-flat{background:rgba(139,111,71,0.12);color:#8b6f47}
-.wow-bar-wrap{margin-top:14px}
-.wow-bar-label{font-size:10px;color:#8b6f47;margin-bottom:4px;letter-spacing:1px}
-.wow-bar-track{background:rgba(201,177,138,0.2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:6px;position:relative}
-.wow-bar-fill{height:100%;border-radius:6px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.wow-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.wow-bar-rowlabel{font-size:11px;color:#5a4230;font-weight:600;min-width:28px}
-.wow-bar-rowpct{font-size:11px;color:#8b6f47;min-width:36px;text-align:right}
+/* Layout */
+.app-shell{max-width:900px;margin:0 auto;padding:24px 16px}
+@media(max-width:600px){.app-shell{padding:16px 12px}}
 
-.ft{max-width:480px;margin:24px auto 0;text-align:center;font-size:11px;color:#b09a7a;line-height:1.8}
-.ft p{margin:4px 0 0}.ft p:first-child{margin:0}
-.rev-detail{font-size:13px;color:#2c6e49;font-weight:600;margin-top:4px}
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.header-left h1{font-size:20px;font-weight:800;letter-spacing:1px;color:var(--text-primary)}
+.header-left p{font-size:11px;color:var(--text-muted);margin-top:2px;letter-spacing:0.5px}
+@media(max-width:600px){.header{flex-direction:column;align-items:flex-start;gap:12px}}
+
+/* Filters */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.fb{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;transition:all .15s;border:1px solid var(--border2);background:var(--surface);color:var(--text-secondary)}
+.fb.active{border-color:transparent;color:#fff}
+.fb span{font-size:13px}
+
+/* Year / Month nav */
+.nav-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.yb{padding:5px 16px;border-radius:6px;font-size:13px;font-weight:700;border:1px solid var(--border2);color:var(--text-secondary);background:var(--surface);transition:all .15s}
+.yb.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.month-scroll{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;flex:1}
+.month-scroll::-webkit-scrollbar{height:3px}.month-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.mb{padding:5px 12px;border-radius:6px;font-size:13px;font-weight:500;white-space:nowrap;border:1px solid var(--border);color:var(--text-secondary);background:var(--surface);flex-shrink:0;transition:all .15s}
+.mb.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+
+/* Calendar */
+.cal-wrap{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:16px}
+.cal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:16px;font-weight:700;letter-spacing:0.5px}
+.cg{display:grid;grid-template-columns:repeat(7,1fr)}
+.wh{text-align:center;font-size:11px;font-weight:600;padding:8px 0;color:var(--text-muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+.dc{width:100%;min-height:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:6px 6px 4px;border-radius:0;font-size:13px;font-weight:600;transition:background .1s;border:none;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;text-align:left;background:var(--surface);color:var(--text-primary)}
+.dc:hover{background:var(--surface2)}
+.dc.selected{background:var(--accent)!important;color:#fff!important}
+.dc.weekend{color:var(--red)}
+.dc.holiday{background:#fff5f5}
+.dc .occ{font-size:9px;font-weight:700;margin-top:1px;display:block}
+.dc .ev{display:block;font-size:8.5px;font-weight:500;line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;opacity:0.85}
+.dc .ev.ex{color:#0d6efd}
+.dc .ev.co{color:#6f42c1}
+.dc .ev.hol{color:#dc3545;font-weight:700}
+.dc .ev.wed{color:#d63384}
+.dc.selected .ev{opacity:0.85;color:rgba(255,255,255,0.85)!important}
+.day-num{line-height:1}
+
+@media(max-width:600px){
+  .dc{min-height:52px;padding:4px 3px 2px;font-size:11px}
+  .dc .ev{font-size:7.5px}
+  .dc .occ{font-size:8px}
+}
+
+/* Day detail panel */
+.pn{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-md);padding:18px 20px;margin-bottom:16px}
+.pn h3{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.pi{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.pi:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.tg{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;color:#fff;display:inline-block}
+.bd{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600}
+.wc{padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;margin:2px;border:1px solid var(--border)}
+
+/* WoW Panel */
+.wow-panel{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-md);padding:18px 20px;margin-bottom:16px}
+.wow-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;letter-spacing:0.3px}
+.wow-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.wow-card{background:var(--surface2);border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border)}
+.wow-label{font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px}
+.wow-value{font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;font-family:'Inter',sans-serif}
+.wow-sub{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.wow-change{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:6px}
+.wow-up{background:rgba(32,201,151,0.12);color:#20c997}
+.wow-down{background:rgba(220,53,69,0.12);color:#dc3545}
+.wow-flat{background:var(--surface2);color:var(--text-muted)}
+.wow-bar-label{font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+
+/* Footer */
+.ft{text-align:center;font-size:11px;color:var(--text-muted);line-height:1.8;padding:16px;border-top:1px solid var(--border);margin-top:8px}
+.ft p{margin:2px 0}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -238,26 +293,26 @@ const{si,sd,f}=S,{y:yr,m:mo}=ML[si],dm=dim(yr,mo),f1=fdm(yr,mo);
 const mEx=EX[mk(yr,mo)]||[],mCo=CO[mk(yr,mo)]||[];
 const sH=sd?H[dk(yr,mo,sd)]:null,sW=sd&&(WD[mk(yr,mo)]||[]).includes(sd);
 const sOD=sd?window.OD[dk(yr,mo,sd)]:null;
-let h=`<div class="header"><h1>2026–2027 年曆</h1><p>2026 丙午馬年 → 2027 丁未羊年（雙春年）</p></div>`;
+let h=`<div class="app-shell"><div class="header"><div class="header-left"><h1>2026–2027 年曆</h1><p>2026 丙午馬年 → 2027 丁未羊年（雙春年）</p></div></div>`;
 h+=`<div class="filters">`;
 [{k:"holiday",l:"國定假日",c:FC.holiday,i:"🏮"},{k:"wedding",l:"宜嫁娶",c:FC.wedding,i:"💍"},{k:"exhibition",l:"展覽",c:FC.exhibition,i:"🎨"},{k:"concert",l:"演唱會",c:FC.concert,i:"🎤"},{k:"occ",l:"住房率",c:"#27ae60",i:"🏨"}].forEach(x=>{
-const on=f[x.k];h+=`<button class="fb" onclick="tf('${x.k}')" style="border-color:${x.c};background:${on?x.c:"transparent"};color:${on?"#fff":x.c}"><span>${x.i}</span>${x.l}</button>`;});
-h+=`</div><div class="yt">`;
-[2026,2027].forEach(y=>{const a=yr===y;h+=`<button class="yb" onclick="sY(${y})" style="border:${a?"2px solid #2c1810":"1px solid #c9b18a"};background:${a?"#2c1810":"transparent"};color:${a?"#fdf6ec":"#5a4230"}">${y}</button>`;});
-h+=`</div><div class="ms">`;
-ML.filter(m=>m.y===yr).forEach(m=>{const gi=ML.indexOf(m),a=si===gi;h+=`<button class="mb" onclick="sM(${gi})" style="border:${a?"2px solid #2c1810":"1px solid #c9b18a"};background:${a?"#2c1810":"rgba(255,255,255,0.5)"};color:${a?"#fdf6ec":"#5a4230"};font-weight:${a?700:400}">${MN[m.m]}</button>`;});
-h+=`</div><div class="cw"><h2 class="ct">${yr} ${MN[mo]}</h2><div class="cg" style="margin-bottom:4px">`;
-W.forEach((w,i)=>{h+=`<div class="wh" style="color:${i===0||i===6?"#c0392b":"#8b6f47"}">${w}</div>`;});
+const on=f[x.k];h+=`<button class="fb ${on?"active":""}" onclick="tf('${x.k}')" style="${on?"background:"+x.c+";border-color:"+x.c:""}"><span>${x.i}</span>${x.l}</button>`;});
+h+=`</div><div class="nav-bar"><div style="display:flex;gap:4px">`;
+[2026,2027].forEach(y=>{const a=yr===y;h+=`<button class="yb ${a?"active":""}" onclick="sY(${y})">${y}</button>`;});
+h+=`</div><div class="month-scroll">`;
+ML.filter(m=>m.y===yr).forEach(m=>{const gi=ML.indexOf(m),a=si===gi;h+=`<button class="mb ${a?"active":""}" onclick="sM(${gi})">${MN[m.m]}</button>`;});
+h+=`</div></div><div class="cal-wrap"><div class="cal-header"><span class="ct">${yr} ${MN[mo]}</span></div><div class="cg">`;
+W.forEach((w,i)=>{h+=`<div class="wh" style="${i===0||i===6?"color:var(--red)":""}">${w}</div>`;});
 h+=`</div><div class="cg">`;
-for(let i=0;i<f1;i++)h+=`<div></div>`;
+for(let i=0;i<f1;i++)h+=`<div style="border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface2)"></div>`;
 for(let d=1;d<=dm;d++){
 const hol=H[dk(yr,mo,d)],wed=(WD[mk(yr,mo)]||[]).includes(d),dow=new Date(yr,mo,d).getDay(),we=dow===0||dow===6,sel=sd===d;
 const sHol=f.holiday&&hol,sWed=f.wedding&&wed;
 const od=window.OD[dk(yr,mo,d)],showOcc=f.occ&&od;
-let bg="transparent",tc=we?"#c0392b":"#2c1810",bd="2px solid transparent";
+let extraClass=we?"weekend":"",bg="",tc="",bd="none";
 if(showOcc&&od[0]>0)bg=occColor(od[0]);
-if(sHol){bg="rgba(231,76,60,0.18)";tc="#c0392b";}
-if(sel){bd="2px solid #2c1810";bg="#2c1810";tc="#fdf6ec";}
+if(sHol)extraClass+=" holiday";
+if(sel)extraClass+=" selected";
 // Build event labels for this day
 const dayEx=(EX[mk(yr,mo)]||[]).filter(e=>{
   if(!f.exhibition)return false;
@@ -280,16 +335,16 @@ const dayCo=(CO[mk(yr,mo)]||[]).filter(e=>{
   if(singleM)return singleM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});
   return false;
 });
-h+=`<button class="dc" onclick="sD(${d})" style="border:${bd};background:${bg};color:${tc};font-weight:${hol?800:500};height:auto;min-height:52px;padding-bottom:3px">${d}`;
-if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,.7)":od[0]>=80?"#e74c3c":od[0]>=50?"#e67e22":"#27ae60"}">${od[0]}%</span>`;
+h+=`<button class="dc ${extraClass}" onclick="sD(${d})" style="${bg?"background:"+bg:""}"><span class="day-num">${d}</span>`;
+if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,0.8)":od[0]>=80?"#dc3545":od[0]>=50?"#fd7e14":"#20c997"}">${od[0]}%</span>`;
 // Holiday name
-if(sHol)h+=`<span style="display:block;font-size:8px;line-height:1.2;margin-top:1px;color:${sel?"#ffaaaa":"#c0392b"};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">🏮${hol}</span>`;
+if(sHol)h+=`<span class="ev hol">🏮${hol}</span>`;
 // Wedding
-if(sWed)h+=`<span style="display:block;font-size:8px;line-height:1.2;color:${sel?"#ffb6c1":FC.wedding}">💍宜嫁娶</span>`;
+if(sWed)h+=`<span class="ev wed">💍宜嫁娶</span>`;
 // Exhibitions
-dayEx.forEach(e=>h+=`<span style="display:block;font-size:8px;line-height:1.2;margin-top:1px;color:${sel?"rgba(255,255,255,.8)":"#8b4513"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">🎨${e.n.replace(/（.*?）/g,'').replace(/台北國際/g,'').replace(/展覽會/g,'展').slice(0,8)}</span>`);
+dayEx.forEach(e=>h+=`<span class="ev ex">🎨${e.n.replace(/（.*?）/g,'').replace(/台北國際/g,'').replace(/展覽會/g,'展').slice(0,8)}</span>`);
 // Concerts
-dayCo.forEach(e=>h+=`<span style="display:block;font-size:8px;line-height:1.2;margin-top:1px;color:${sel?"rgba(255,255,255,.8)":"#6a0dad"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">🎤${e.n.replace(/演唱會/g,'').replace(/巡迴/g,'').replace(/世界/g,'').slice(0,8)}</span>`);
+dayCo.forEach(e=>h+=`<span class="ev co">🎤${e.n.replace(/演唱會/g,'').replace(/巡迴/g,'').replace(/世界/g,'').slice(0,8)}</span>`);
 h+=`</button>`;}
 h+=`</div></div>`;
 h+=renderWoW(yr,mo);
@@ -312,7 +367,7 @@ const wd=WD[mk(yr,mo)];
 if(f.wedding&&wd&&wd.length>0){
 h+=`<div class="pn" style="background:rgba(233,30,142,0.04);border:1px solid rgba(233,30,142,0.15)"><h3 style="color:#e91e8e">💍 ${MN[mo]}宜嫁娶吉日</h3><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
 wd.forEach(d=>{const dn=W[new Date(yr,mo,d).getDay()],s2=sd===d;h+=`<span class="wc" onclick="sD(${d})" style="background:${s2?"#e91e8e":"rgba(233,30,142,0.1)"};color:${s2?"#fff":"#c0176e"}">${d}日（${dn}）</span>`;});h+=`</div></div>`;}
-h+=`<div class="ft"><p>最後更新：2026年4月27日</p><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
+h+=`</div></div><div class="ft"><p>最後更新：2026年4月27日</p><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
 document.getElementById("app").innerHTML=h;}
 function tf(k){S.f[k]=!S.f[k];render();}
 function sY(y){S.si=ML.findIndex(m=>m.y===y);S.sd=null;render();}
