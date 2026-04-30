@@ -671,6 +671,7 @@ window.handleExcelUpload = async function(input) {
 
     const newOD = {};
     let count = 0;
+    let uploadDateKey = null;
     for (let i = 6; i < rows.length; i++) {
       const row = rows[i];
       if (!row[0]) continue;
