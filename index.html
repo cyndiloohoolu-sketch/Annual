@@ -88,6 +88,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .dc.weekend{color:var(--red)}
 .dc.holiday{background:#fff8f8}
 .dc.selected{background:var(--accent)!important;color:#fff!important}
+.dc.forecast{background:var(--surface);}
+.dc.forecast .day-num{opacity:0.6}
+.dc.forecast .occ{opacity:0.6;font-style:italic}
+.dc.forecast::after{content:"";position:absolute;top:3px;right:3px;width:4px;height:4px;border-radius:50%;background:var(--orange);opacity:0.7}
 .dc .occ{font-size:9px;font-weight:700;margin-top:1px;display:block}
 .dc .ev{display:block;font-size:8px;font-weight:500;line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .dc .ev.ex{color:var(--blue)}
@@ -402,8 +406,11 @@ const hol=H[dk(yr,mo,d)],wed=(WD[mk(yr,mo)]||[]).includes(d),dow=new Date(yr,mo,
 const sHol=f.holiday&&hol,sWed=f.wedding&&wed;
 const od=window.OD[dk(yr,mo,d)],showOcc=f.occ&&od;
 let extraClass=we?"weekend":"",bg="",tc="",bd="none";
-if(showOcc&&od[0]>0)bg=occColor(od[0]);
+// Mark forecast days (on or after pull date)
+const isForecast = window.OCC_PULL_DATE && dk >= window.OCC_PULL_DATE;
+if(showOcc&&od[0]>0)bg=isForecast?"":occColor(od[0]);
 if(sHol)extraClass+=" holiday";
+if(isForecast)extraClass+=" forecast";
 if(sel)extraClass+=" selected";
 // Build event labels for this day
 const dayEx=(EX[mk(yr,mo)]||[]).filter(e=>{
@@ -608,7 +615,10 @@ async function loadFirestoreOCC() {
           totalKeys++;
         });
       });
-      console.log("✅ Firestore OCC loaded:", totalKeys, "entries, sample:", Object.keys(window.OD).slice(0,3));
+      // Restore pull date from localStorage
+      const savedPullDate = localStorage.getItem('occ_pull_date');
+      if (savedPullDate) window.OCC_PULL_DATE = savedPullDate;
+      console.log("✅ Firestore OCC loaded:", totalKeys, "entries, pull date:", window.OCC_PULL_DATE);
       window.render();
     } else {
       console.log("ℹ️ Firestore OCC: no data found");
@@ -721,6 +731,14 @@ window.handleExcelUpload = async function(input) {
       if (history.length > 30) history.splice(0, history.length - 30);
       localStorage.setItem('wow_history', JSON.stringify(history));
     } catch(e) { console.warn('Snapshot save failed:', e); }
+    // Store pull date for calendar rendering (actual vs forecast distinction)
+    if (uploadDateKey) {
+      window.OCC_PULL_DATE = uploadDateKey;
+      localStorage.setItem('occ_pull_date', uploadDateKey);
+    }
+    // Merge new data into window.OD and re-render calendar
+    Object.assign(window.OD, newOD);
+    window.render();
     statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！";
     statusEl.style.color = "#27ae60";
     input.value = "";
