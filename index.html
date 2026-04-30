@@ -467,7 +467,7 @@ h+=`</div></div><div class="ft"><p id="last-update-date">__LAST_UPDATE__</p><p>�
 // Inject dynamic date
 const pullDate = window.OCC_PULL_DATE || localStorage.getItem('occ_pull_date');
 const uploadTs = localStorage.getItem('occ_upload_ts');
-let dateText = '最後更新：2026年4月27日';
+let dateText = pullDate ? '' : '資料載入中...';
 if (pullDate) {
   const [py,pm,pd] = pullDate.split('-');
   dateText = '資料截至：'+py+'年'+parseInt(pm)+'月'+parseInt(pd)+'日'+(uploadTs?'　上傳：'+uploadTs:'');
@@ -626,9 +626,22 @@ async function loadFirestoreOCC() {
           totalKeys++;
         });
       });
-      // Restore pull date from localStorage
-      const savedPullDate = localStorage.getItem('occ_pull_date');
-      if (savedPullDate) window.OCC_PULL_DATE = savedPullDate;
+      // Restore pull date from Firestore meta
+      try {
+        const metaSnap = await getDoc(doc(db, "meta", "info"));
+        if (metaSnap.exists()) {
+          const meta = metaSnap.data();
+          if (meta.pullDate) {
+            window.OCC_PULL_DATE = meta.pullDate;
+            localStorage.setItem('occ_pull_date', meta.pullDate);
+          }
+          if (meta.lastUpdated) {
+            const d = new Date(meta.lastUpdated);
+            const ts = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+            localStorage.setItem('occ_upload_ts', ts);
+          }
+        }
+      } catch(e) { console.warn('Meta load failed:', e); }
       console.log("✅ Firestore OCC loaded:", totalKeys, "entries, pull date:", window.OCC_PULL_DATE);
       window.render();
     } else {
