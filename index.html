@@ -653,7 +653,7 @@ async function loadFirestoreOCC() {
 }
 
 // Upload OCC data to Firestore (admin only)
-window.uploadToFirestore = async function(occData) {
+window.uploadToFirestore = async function(occData, uploadDateKey) {
   // Split into chunks of 100 dates per document (Firestore 1MB limit)
   const entries = Object.entries(occData);
   const chunkSize = 100;
