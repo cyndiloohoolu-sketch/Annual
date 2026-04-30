@@ -665,7 +665,8 @@ window.uploadToFirestore = async function(occData) {
   // Save upload timestamp
   await setDoc(doc(db, "meta", "info"), {
     lastUpdated: new Date().toISOString(),
-    uploadedBy: "admin"
+    uploadedBy: "admin",
+    pullDate: uploadDateKey || null
   });
 };
 
@@ -716,6 +717,10 @@ window.handleExcelUpload = async function(input) {
       if (!/^202[6-9]\d{4}$/.test(dateStr)) continue;
       const y = dateStr.slice(0,4), m = dateStr.slice(4,6), d = dateStr.slice(6,8);
       const key = y + "-" + m + "-" + d;
+      // Detect pull date: first row with * in column B
+      if (!uploadDateKey && row[1] && String(row[1]).trim() === '*') {
+        uploadDateKey = key;
+      }
       const occ = parseFloat(row[3]);
       const rev = parseFloat(row[8]);
       if (!isNaN(occ) && !isNaN(rev)) {
@@ -765,7 +770,7 @@ window.handleExcelUpload = async function(input) {
     // Merge new data into window.OD and re-render calendar
     Object.assign(window.OD, newOD);
     window.render();
-    statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！";
+    statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！" + (uploadDateKey ? "　資料截至 " + uploadDateKey : "");
     statusEl.style.color = "#27ae60";
     input.value = "";
   } catch(e) {
