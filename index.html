@@ -7,803 +7,273 @@
 <meta name="description" content="2026-2027台灣互動式年曆，含國定假日、台北展覽、農曆宜嫁娶吉日、演唱會、住房率資訊">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap');
-
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#f8f9fa;
-  --surface:#ffffff;
-  --surface2:#f1f3f5;
-  --border:#e9ecef;
-  --border2:#dee2e6;
-  --text-primary:#212529;
-  --text-secondary:#6c757d;
-  --text-muted:#adb5bd;
-  --accent:#1a1a2e;
-  --red:#dc3545;
-  --orange:#fd7e14;
-  --green:#20c997;
-  --blue:#0d6efd;
-  --purple:#6f42c1;
-  --pink:#d63384;
-  --radius:8px;
-  --radius-lg:12px;
-  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.05);
-}
-body{font-family:'Noto Sans TC','Inter',sans-serif;min-height:100vh;background:var(--bg);color:var(--text-primary)}
+body{font-family:'Noto Serif TC',serif;min-height:100vh;background:linear-gradient(135deg,#fdf6ec 0%,#f5e6d3 40%,#ede0d4 100%);padding:24px 16px;color:#2c1810}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
-
-/* App shell */
-.app-shell{max-width:900px;margin:0 auto;padding:20px 16px}
-@media(max-width:600px){.app-shell{padding:12px 10px}}
-
-/* Header */
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)}
-.header-left h1{font-size:20px;font-weight:800;letter-spacing:0.5px}
-.header-left p{font-size:11px;color:var(--text-muted);margin-top:2px}
-@media(max-width:600px){
-  .header-left h1{font-size:16px}
-  .header-left p{font-size:10px}
-}
-
-/* Filter bar — icon pills on mobile */
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.fb{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;transition:all .15s;border:1px solid var(--border2);background:var(--surface);color:var(--text-secondary)}
-.fb.active{border-color:transparent;color:#fff}
-.fb .fb-label{display:inline}
-@media(max-width:600px){
-  .fb{padding:6px 8px;border-radius:50%;width:36px;height:36px;justify-content:center}
-  .fb .fb-label{display:none}
-  .fb span{font-size:16px}
-}
-
-/* Nav bar: year + months in one row */
-.nav-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.yb{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:700;border:1px solid var(--border2);color:var(--text-secondary);background:var(--surface);transition:all .15s;flex-shrink:0}
-.yb.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.month-scroll{display:flex;gap:4px;overflow-x:auto;flex:1;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-.month-scroll::-webkit-scrollbar{display:none}
-.mb{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;white-space:nowrap;border:1px solid var(--border);color:var(--text-secondary);background:var(--surface);flex-shrink:0;transition:all .15s}
-.mb.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
-
-/* Mobile: month nav with prev/next arrows */
-@media(max-width:600px){
-  .nav-bar{gap:6px}
-  .yb{padding:5px 10px;font-size:12px}
-  .mb{padding:5px 10px;font-size:12px}
-}
-
-/* Calendar */
-.cal-wrap{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:14px}
-.cal-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.ct{font-size:15px;font-weight:700}
-.cal-nav-btn{width:32px;height:32px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);flex-shrink:0}
-.cal-nav-btn:hover{background:var(--border)}
-.cg{display:grid;grid-template-columns:repeat(7,1fr)}
-.wh{text-align:center;font-size:11px;font-weight:600;padding:6px 0;color:var(--text-muted);background:var(--surface2);border-bottom:1px solid var(--border)}
-
-/* Day cells */
-.dc{width:100%;min-height:72px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:5px 5px 4px;border-radius:0;font-size:13px;font-weight:600;border:none;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;text-align:left;background:var(--surface);color:var(--text-primary);transition:background .1s}
-.dc:hover{background:#f8f9fa}
-.dc.weekend{color:var(--red)}
-.dc.holiday{background:#fff8f8}
-.dc.selected{background:var(--accent)!important;color:#fff!important}
-.dc.forecast{background:var(--surface);}
-.dc.forecast .day-num{opacity:0.6}
-.dc.forecast .occ{opacity:0.6;font-style:italic}
-.dc.forecast::after{content:"";position:absolute;top:3px;right:3px;width:4px;height:4px;border-radius:50%;background:var(--orange);opacity:0.7}
-.dc .occ{font-size:9px;font-weight:700;margin-top:1px;display:block}
-.dc .ev{display:block;font-size:8px;font-weight:500;line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.dc .ev.ex{color:var(--blue)}
-.dc .ev.co{color:var(--purple)}
-.dc .ev.hol{color:var(--red);font-weight:700}
-.dc .ev.wed{color:var(--pink)}
-.dc.selected .ev,.dc.selected .occ{color:rgba(255,255,255,0.85)!important}
-
-/* Mobile: compact cells, dots instead of text labels */
-@media(max-width:600px){
-  .dc{min-height:52px;padding:4px 3px 3px;font-size:12px}
-  .dc .occ{font-size:8px}
-  .dc .ev{display:none}
-  .dc .dots-row{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap}
-  .dot{width:5px;height:5px;border-radius:50%;display:inline-block;flex-shrink:0}
-}
-@media(min-width:601px){
-  .dots-row{display:none}
-}
-
-/* Popup */
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .15s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.popup{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.2);width:100%;max-width:360px;max-height:85vh;overflow-y:auto;animation:slideUp .2s ease}
-@media(max-width:600px){
-  .popup-overlay{align-items:flex-end;padding:0}
-  .popup{max-width:100%;border-radius:16px 16px 0 0;max-height:75vh}
-}
-@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.popup-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1}
-.popup-date{font-size:15px;font-weight:700}
-.popup-dow{font-size:12px;color:var(--text-muted);margin-left:6px;font-weight:400}
-.popup-close{width:28px;height:28px;border-radius:6px;background:var(--surface2);border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);flex-shrink:0}
-.popup-body{padding:14px 18px}
-.popup-section{margin-bottom:14px}
-.popup-section:last-child{margin-bottom:0}
-.popup-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:8px}
-.popup-row{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;background:var(--surface2);margin-bottom:6px}
-.popup-row:last-child{margin-bottom:0}
-.popup-row-icon{font-size:16px;flex-shrink:0;margin-top:1px}
-.popup-row-content{flex:1;min-width:0}
-.popup-row-name{font-size:13px;font-weight:600;color:var(--text-primary);line-height:1.4}
-.popup-row-meta{font-size:11px;color:var(--text-secondary);margin-top:3px;line-height:1.5}
-.popup-occ-row{display:flex;gap:10px;margin-bottom:6px}
-.popup-occ-card{flex:1;background:var(--surface2);border-radius:8px;padding:10px 12px;text-align:center}
-.popup-occ-label{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
-.popup-occ-val{font-size:20px;font-weight:800;font-family:'Inter',sans-serif;margin-top:2px}
-.popup-empty{text-align:center;padding:24px;color:var(--text-muted);font-size:13px}
-
-/* WoW */
-.wow-panel{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-md);padding:18px 20px;margin-bottom:14px}
-.wow-title{font-size:13px;font-weight:700;color:var(--text-primary);letter-spacing:0.3px}
-.wow-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.wow-card{background:var(--surface2);border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border)}
-.wow-label{font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px}
-.wow-value{font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;font-family:'Inter',sans-serif}
-.wow-sub{font-size:11px;color:var(--text-secondary);margin-top:2px}
-.wow-change{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:6px}
-.wow-up{background:rgba(32,201,151,0.12);color:#20c997}
-.wow-down{background:rgba(220,53,69,0.12);color:#dc3545}
-.wow-flat{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
-.wow-bar-label{font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
-
-/* Footer */
-.ft{text-align:center;font-size:11px;color:var(--text-muted);line-height:1.8;padding:16px 16px 32px;border-top:1px solid var(--border);margin-top:4px}
-.ft p{margin:2px 0}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:30px;font-weight:900;letter-spacing:6px}
+.header p{font-size:12px;color:#8b6f47;margin-top:6px;letter-spacing:3px;font-style:italic}
+.filters{display:flex;justify-content:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.fb{display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;transition:all .2s;border:2px solid}
+.yt{display:flex;justify-content:center;gap:8px;margin-bottom:10px}
+.yb{padding:6px 20px;border-radius:20px;font-size:15px;font-weight:700}
+.ms{display:flex;gap:5px;max-width:500px;margin:0 auto 16px;overflow-x:auto;padding-bottom:4px}
+.ms::-webkit-scrollbar{height:4px}.ms::-webkit-scrollbar-thumb{background:#c9b18a;border-radius:4px}
+.mb{padding:7px 0;min-width:46px;border-radius:8px;flex-shrink:0;font-size:13px;transition:all .2s}
+.cw{max-width:480px;margin:0 auto;background:rgba(255,255,255,.65);border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(44,24,16,.08);backdrop-filter:blur(8px)}
+.ct{text-align:center;font-size:20px;margin-bottom:12px;letter-spacing:4px}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wh{text-align:center;font-size:12px;font-weight:700;padding:4px 0}
+.dc{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:14px;transition:all .15s;padding:2px 0;border:2px solid transparent;position:relative;line-height:1.2}
+.dc:hover{transform:scale(1.06)}
+.dc .occ{font-size:8px;font-weight:600;opacity:.8;margin-top:1px}
+.dots{display:flex;gap:2px;margin-top:1px;min-height:5px}
+.dot{width:4px;height:4px;border-radius:50%;display:inline-block}
+.pn{max-width:480px;margin:16px auto 0;border-radius:12px;padding:14px 18px}
+.pn h3{margin:0 0 10px;font-size:15px;letter-spacing:2px;display:flex;align-items:center;gap:6px}
+.pi{margin-bottom:10px;padding-bottom:10px}
+.tg{font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600;white-space:nowrap;color:#fff}
+.bd{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:13px;font-weight:600}
+.wc{padding:4px 10px;border-radius:16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;margin:3px}
+.ft{max-width:480px;margin:24px auto 0;text-align:center;font-size:11px;color:#b09a7a;line-height:1.8}
+.ft p{margin:4px 0 0}.ft p:first-child{margin:0}
+.rev-detail{font-size:13px;color:#2c6e49;font-weight:600;margin-top:4px}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div id="app"></div>
 <script>
 const W=["日","一","二","三","四","五","六"],MN=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],ML=[];
-for(let m=3;m<12;m++)ML.push({y:2026,m});for(let m=0;m<12;m++)ML.push({y:2027,m});
+for(let m=4;m<12;m++)ML.push({y:2026,m});for(let m=0;m<12;m++)ML.push({y:2027,m});
 const p=n=>n<10?"0"+n:""+n,mk=(y,m)=>y+"-"+p(m+1),dk=(y,m,d)=>y+"-"+p(m+1)+"-"+p(d),dim=(y,m)=>new Date(y,m+1,0).getDate(),fdm=(y,m)=>new Date(y,m,1).getDay();
 const H={"2026-05-01":"勞動節","2026-05-02":"勞動節補假","2026-06-19":"端午節","2026-06-20":"端午節補假","2026-06-21":"端午節彈性放假","2026-09-25":"中秋節","2026-09-26":"中秋節補假","2026-09-27":"中秋節彈性放假","2026-09-28":"教師節","2026-10-09":"國慶補假","2026-10-10":"國慶日","2026-10-11":"國慶彈性放假","2026-10-24":"光復節補假","2026-10-25":"台灣光復節","2026-10-26":"光復節彈性放假","2026-12-25":"行憲紀念日","2026-12-26":"行憲紀念日補假","2026-12-27":"行憲彈性放假","2027-01-01":"元旦","2027-01-02":"元旦補假","2027-02-05":"小年夜","2027-02-06":"除夕","2027-02-07":"春節初一","2027-02-08":"春節初二","2027-02-09":"春節初三","2027-02-10":"春節補假","2027-02-28":"和平紀念日","2027-03-01":"228補假","2027-04-04":"兒童節","2027-04-05":"清明節","2027-04-06":"清明補假","2027-05-01":"勞動節","2027-06-09":"端午節","2027-09-15":"中秋節","2027-09-28":"教師節","2027-10-10":"國慶日","2027-10-11":"國慶補假","2027-10-25":"台灣光復節","2027-12-25":"行憲紀念日"};
-const EX={"2026-04":[{n:"TAIPEI AMPA 台北國際汽機車零配件展",v:"南港展覽館1館",p:"4/16~4/19"},{n:"台北國際安全科技應用博覽會",v:"南港展覽館1館",p:"4/22~4/24"}],"2026-05":[{n:"ATLife 臺灣輔具暨長照大展",v:"南港展覽館1館",p:"5/14~5/17"},{n:"台北國際潮流玩具、授權展",v:"世貿一館",p:"5/29~6/1"}],"2026-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館＋世貿",p:"6/2~6/5"},{n:"國際扶輪年會（Rotary Convention）",v:"台北大巨蛋＋南港展覽館1&2館",p:"6/13~6/17"},{n:"台北國際飯店設備用品展",v:"南港展覽館2館",p:"6/24~6/27"}],"2026-07":[{n:"台北國際生物科技展",v:"南港展覽館1館",p:"7/16~7/19"},{n:"台北國際美容保養展",v:"南港展覽館1館",p:"7/16~7/19"},{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],"2026-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會",v:"世貿一館",p:"8/14~8/17"}],"2026-09":[{n:"SEMICON Taiwan 國際半導體展",v:"南港展覽館1&2館",p:"9/2~9/4"}],"2026-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2026-11":[{n:"臺北白晝之夜 Nuit Blanche（預估）",v:"台北市區",p:"11/7"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"},{n:"北美館特展（預估）",v:"臺北市立美術館",p:"10月底起"}],"2026-12":[{n:"臺北馬拉松（預估）",v:"台北市區",p:"12/20"},{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}],"2027-01":[{n:"台北國際書展（預估）",v:"南港展覽館1館",p:"1月底~2月初"},{n:"故宮常設展",v:"國立故宮博物院",p:"常設展"}],"2027-02":[{n:"台北國際動漫節（預估）",v:"南港展覽館1館",p:"2月上旬"},{n:"台北燈節",v:"台北市區",p:"2月中"}],"2027-03":[{n:"TIMTOS 台北國際工具機展",v:"南港展覽館1&2館",p:"3/2~3/7"},{n:"TAIPEI CYCLE 自行車展（預估）",v:"南港展覽館1&2館",p:"3月下旬"}],"2027-04":[{n:"台北國際汽機車零配件展（預估）",v:"南港展覽館1館",p:"4月中"}],"2027-05":[{n:"台北當代藝術博覽會（預估）",v:"南港展覽館",p:"5月中"},{n:"ATLife 輔具暨長照展（預估）",v:"南港展覽館1館",p:"5月中"}],"2027-06":[{n:"COMPUTEX 台北國際電腦展（預估）",v:"南港展覽館1&2館",p:"6月上旬"}],"2027-07":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],"2027-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會（預估）",v:"世貿一館",p:"8月中"},{n:"台北新藝術博覽會（預估）",v:"松山文創園區",p:"8月下旬"}],"2027-09":[{n:"SEMICON Taiwan（預估）",v:"南港展覽館1&2館",p:"9月上旬"},{n:"台北國際自動化展（預估）",v:"南港展覽館1&2館",p:"9月"}],"2027-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2027-11":[{n:"第15屆台北雙年展（預估）",v:"臺北市立美術館",p:"11月起"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"}],"2027-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}]};
-const WD={"2026-04":[1,3,6,8,11,13,15,18,20,22,23,25,27,28],"2026-05":[1,4,6,7,10,11,13,16,18,20,21,24,25,27,30],"2026-06":[1,2,5,6,8,11,13,14,15,16,19,20,22,25,27,28],"2026-07":[1,2,4,7,9,10,13,15,16,18,21,23,24,27,28,30],"2026-08":[2,3,5,8,10,11,14,15,17,20,22,24,26,27,29],"2026-09":[1,2,5,7,8,11,13,14,17,19,20,23,25,26,29],"2026-10":[1,3,6,8,10,11,14,17,19,20,23,25,26,29,31],"2026-11":[1,2,5,7,8,11,13,14,17,19,20,22,25,26,29],"2026-12":[1,2,4,7,8,10,13,14,16,19,20,22,25,26,28,31],"2027-01":[2,5,6,15,17,23,24,31],"2027-02":[6,9,14,17,20,21,26],"2027-03":[4,5,6,8,10,11,13,16,17,18,23,28,29],"2027-04":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],"2027-05":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],"2027-06":[5,9,10,11,12,18,19,21,24,27],"2027-07":[3,5,7,9,11,15,17,19,21,23,27,29,31],"2027-08":[2,5,8,10,14,17,20,22,26,29],"2027-09":[1,3,7,9,12,15,19,21,24,27],"2027-10":[1,3,6,9,12,15,18,21,24,27,30],"2027-11":[2,5,8,12,14,17,20,23,26,29],"2027-12":[3,5,8,12,16,19,22,27,28]};
-const CO={"2026-04":[{n:"鄧紫棋《I AM GLORIA》2.0演唱會",v:"台北大巨蛋",p:"4/9~4/12"},{n:"ONE OK ROCK《DETOX》演唱會",v:"台北大巨蛋",p:"4/25~4/26"},{n:"周蕙「好想好好愛」演唱會",v:"台北小巨蛋",p:"4/25"}],"2026-05":[{n:"動力火車《都是因為愛》安可場",v:"台北小巨蛋",p:"5/3~5/5"},{n:"EXO PLANET #6《EXhOrizon》演唱會",v:"台北小巨蛋",p:"5/9~5/10"},{n:"動力火車《一路向前》世界巡迴",v:"台北小巨蛋",p:"5/15~5/17"},{n:"孫燕姿「日落以後」演唱會",v:"台北大巨蛋",p:"5/15、5/17"},{n:"韋禮安《HI WE1 韋，您好》演唱會",v:"台北小巨蛋",p:"5/30~5/31"}],"2026-06":[{n:"King Gnu《CEN+RAL Tour 2026》",v:"台北小巨蛋",p:"6/6~6/7"},{n:"國際扶輪年會（5萬人大型會議）",v:"台北大巨蛋＋南港展覽館1&2館",p:"6/13~6/17"},{n:"LiSA《LiVE is Smile Always ～15～》",v:"台北小巨蛋",p:"6/19~6/20"}],"2026-07":[{n:"滅火器《ON FIRE DAY》演唱會",v:"台北小巨蛋",p:"7/18~7/19"}],"2026-08":[{n:"aespa《2026-27 LIVE TOUR SYNK》",v:"台北（場館待確認）",p:"8/11"}],"2026-09":[{n:"IVE《SHOW WHAT I AM》世界巡迴",v:"台北小巨蛋",p:"9/11~9/13"},{n:"LANY《soft world tour》",v:"台北小巨蛋",p:"9/26"}]};
-const CTBD=[{n:"YOASOBI ASIA DOME & STADIUM TOUR",v:"台北大巨蛋（預計）",p:"2026-2027 日期待公布"}];
+const EX={"2026-05":[{n:"ATLife 臺灣輔具暨長照展",v:"南港展覽館1館",p:"5/14~5/17"},{n:"台北當代藝術博覽會",v:"南港展覽館",p:"5月中"}],"2026-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館+世貿",p:"6/2~6/5"},{n:"台北國際食品展",v:"南港展覽館+世貿1館",p:"6/24~6/27"}],"2026-07":[{n:"展昭寵物用品展",v:"南港展覽館1館",p:"7/3~7/6"},{n:"台灣生技展",v:"南港展覽館1館",p:"7/16~7/19"},{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],"2026-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會",v:"世貿一館",p:"8/14~8/17"},{n:"台北國際自動化展",v:"南港展覽館1&2館",p:"8/19~8/22"}],"2026-09":[{n:"SEMICON Taiwan 國際半導體展",v:"南港展覽館1&2館",p:"9/2~9/4"}],"2026-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2026-11":[{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"},{n:"北美館特展（預估）",v:"臺北市立美術館",p:"10月底起"}],"2026-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}],"2027-01":[{n:"台北國際書展（預估）",v:"南港展覽館1館",p:"1月底~2月初"},{n:"故宮常設展",v:"國立故宮博物院",p:"常設展"}],"2027-02":[{n:"台北國際動漫節（預估）",v:"南港展覽館1館",p:"2月上旬"},{n:"台北燈節",v:"台北市區",p:"2月中"}],"2027-03":[{n:"TIMTOS 台北國際工具機展",v:"南港展覽館1&2館",p:"3/2~3/7"},{n:"TAIPEI CYCLE 自行車展（預估）",v:"南港展覽館1&2館",p:"3月下旬"}],"2027-04":[{n:"台北國際汽機車零配件展（預估）",v:"南港展覽館1館",p:"4月中"},{n:"Touch Taiwan 智慧顯示展",v:"南港展覽館1館",p:"4/21~4/23"}],"2027-05":[{n:"台北當代藝術博覽會（預估）",v:"南港展覽館",p:"5月中"},{n:"ATLife 輔具暨長照展（預估）",v:"南港展覽館1館",p:"5月中"}],"2027-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館",p:"6/1~6/4"}],"2027-07":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],"2027-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會（預估）",v:"世貿一館",p:"8月中"},{n:"台北新藝術博覽會（預估）",v:"松山文創園區",p:"8月下旬"}],"2027-09":[{n:"SEMICON Taiwan（預估）",v:"南港展覽館1&2館",p:"9月上旬"},{n:"台北國際自動化展（預估）",v:"南港展覽館1&2館",p:"9月"}],"2027-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2027-11":[{n:"第15屆台北雙年展（預估）",v:"臺北市立美術館",p:"11月起"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"}],"2027-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}]};
+const WD={"2026-05":[1,4,6,7,10,11,13,16,18,20,21,24,25,27,30],"2026-06":[1,2,5,6,8,11,13,14,15,16,19,20,22,25,27,28],"2026-07":[1,2,4,7,9,10,13,15,16,18,21,23,24,27,28,30],"2026-08":[2,3,5,8,10,11,14,15,17,20,22,24,26,27,29],"2026-09":[1,2,5,7,8,11,13,14,17,19,20,23,25,26,29],"2026-10":[1,3,6,8,10,11,14,17,19,20,23,25,26,29,31],"2026-11":[1,2,5,7,8,11,13,14,17,19,20,22,25,26,29],"2026-12":[1,2,4,7,8,10,13,14,16,19,20,22,25,26,28,31],"2027-01":[2,5,6,15,17,23,24,31],"2027-02":[6,9,14,17,20,21,26],"2027-03":[4,5,6,8,10,11,13,16,17,18,23,28,29],"2027-04":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],"2027-05":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],"2027-06":[5,9,10,11,12,18,19,21,24,27],"2027-07":[3,5,7,9,11,15,17,19,21,23,27,29,31],"2027-08":[2,5,8,10,14,17,20,22,26,29],"2027-09":[1,3,7,9,12,15,19,21,24,27],"2027-10":[1,3,6,9,12,15,18,21,24,27,30],"2027-11":[2,5,8,12,14,17,20,23,26,29],"2027-12":[3,5,8,12,16,19,22,27,28]};
+const CO={"2026-04":[{n:"鄧紫棋《I AM GLORIA》2.0演唱會",v:"台北大巨蛋",p:"4/9~4/12"},{n:"ONE OK ROCK《DETOX》演唱會",v:"台北大巨蛋",p:"4/25~4/26"},{n:"周蕙「好想好好愛」演唱會",v:"台北小巨蛋",p:"4/25"}],"2026-05":[{n:"動力火車《都是因為愛》安可場",v:"台北小巨蛋",p:"5/3~5/5"},{n:"EXO PLANET #6《EXhOrizon》演唱會",v:"台北小巨蛋",p:"5/9~5/10"},{n:"動力火車《一路向前》世界巡迴",v:"台北小巨蛋",p:"5/15~5/17"},{n:"孫燕姿「日落以後」演唱會",v:"台北大巨蛋",p:"5/15、5/17"},{n:"韋禮安《HI WE1 韋，您好》演唱會",v:"台北小巨蛋",p:"5/30~5/31"}],"2026-06":[{n:"King Gnu《CEN+RAL Tour 2026》",v:"台北小巨蛋",p:"6/6~6/7"},{n:"國際扶輪年會（5萬人大型會議）",v:"台北大巨蛋＋南港展覽館1&2館",p:"6/13~6/17"},{n:"LiSA《LiVE is Smile Always ～15～》",v:"台北小巨蛋",p:"6/19~6/20"}],"2026-07":[{n:"五月天《#5525+2回到那一天》",v:"台北大巨蛋",p:"7/3~7/5、7/8、7/10~7/12"},{n:"滅火器《ON FIRE DAY》演唱會",v:"台北小巨蛋",p:"7/18~7/19"}],"2026-08":[{n:"aespa《2026-27 LIVE TOUR SYNK》",v:"台北大巨蛋",p:"8/11"}],"2026-09":[{n:"IVE《SHOW WHAT I AM》世界巡迴",v:"台北小巨蛋",p:"9/11~9/13"},{n:"LANY《soft world tour》",v:"台北小巨蛋",p:"9/26"}],"2026-10":[{n:"BIGBANG《20/26 WORLD TOUR》",v:"台北大巨蛋",p:"10/10~10/11"}],"2026-11":[{n:"YOASOBI 亞洲巨蛋巡演（日期待公布）",v:"台北大巨蛋",p:"TBD"}],"2026-12":[{n:"台北市跨年晚會（卡司待公布）",v:"台北市府廣場",p:"12/31"},{n:"台北101跨年煙火",v:"台北101",p:"12/31"}]};
+const CTBD=[];
 
-// Monthly Budget targets [occ%, totalRev]
-const BUDGET={
-  "2026-04":[78.1,10528515],
-  "2026-05":[79.01,11360291],
-  "2026-06":[80.71,11368055],
-  "2026-07":[72.02,8982167],
-  "2026-08":[68.33,8751734],
-  "2026-09":[73.05,9827650],
-  "2026-10":[76.99,10627811],
-  "2026-11":[86.44,11733561],
-  "2026-12":[82.52,10496700]
-};
+const BUDGET={"2026-04":[78.1,10528515],"2026-05":[79.01,11360291],"2026-06":[80.71,11368055],"2026-07":[72.02,8982167],"2026-08":[68.33,8751734],"2026-09":[73.05,9827650],"2026-10":[76.99,10627811],"2026-11":[86.44,11733561],"2026-12":[82.52,10496700]};
 const FC={holiday:"#e74c3c",wedding:"#e91e8e",exhibition:"#2980b9",concert:"#8e44ad"};
 // OCC & Revenue data [occ%, totalRent]
-window.OD={"2026-04-01":[52.08,225598],"2026-04-02":[66.67,304828],"2026-04-03":[90.63,443358],"2026-04-04":[88.54,459091],"2026-04-05":[63.54,314253],"2026-04-06":[57.29,256173],"2026-04-07":[60.42,266748],"2026-04-08":[61.46,267906],"2026-04-09":[69.79,310342],"2026-04-10":[87.5,381336],"2026-04-11":[96.88,462425],"2026-04-12":[56.25,267357],"2026-04-13":[45.83,208845],"2026-04-14":[70.83,296006],"2026-04-15":[77.08,323758],"2026-04-16":[73.96,307874],"2026-04-17":[80.21,348146],"2026-04-18":[88.54,420720],"2026-04-19":[37.5,175498],"2026-04-20":[40.63,183919],"2026-04-21":[52.08,236397],"2026-04-22":[83.33,330171],"2026-04-23":[80.21,315211],"2026-04-24":[85.42,350651],"2026-04-25":[76.04,397267],"2026-04-26":[30.21,135478],"2026-04-27":[38.54,177254],"2026-04-28":[36.46,167308],"2026-04-29":[33.33,158810],"2026-04-30":[26.04,119068],"2026-05-01":[84.38,409999],"2026-05-02":[91.67,437466],"2026-05-03":[55.21,249235],"2026-05-04":[50.0,225461],"2026-05-05":[34.38,142666],"2026-05-06":[21.88,94364],"2026-05-07":[23.96,99894],"2026-05-08":[33.33,144822],"2026-05-09":[33.33,145195],"2026-05-10":[15.63,66572],"2026-05-11":[16.67,67948],"2026-05-12":[16.67,71129],"2026-05-13":[15.63,71135],"2026-05-14":[26.04,107791],"2026-05-15":[65.63,268766],"2026-05-16":[68.75,292679],"2026-05-17":[14.58,62827],"2026-05-18":[14.58,62959],"2026-05-19":[20.83,86506],"2026-05-20":[34.38,126211],"2026-05-21":[32.29,119861],"2026-05-22":[33.33,134075],"2026-05-23":[76.04,327084],"2026-05-24":[40.63,158835],"2026-05-25":[43.75,167002],"2026-05-26":[11.46,50075],"2026-05-27":[53.13,224901],"2026-05-28":[60.42,255780],"2026-05-29":[66.67,340364],"2026-05-30":[53.13,244451],"2026-05-31":[79.17,333500],"2026-06-01":[70.83,355822],"2026-06-02":[76.04,396698],"2026-06-03":[68.75,343518],"2026-06-04":[57.29,286600],"2026-06-05":[38.54,197727],"2026-06-06":[29.17,173386],"2026-06-07":[21.88,130571],"2026-06-08":[16.67,108014],"2026-06-09":[26.04,184214],"2026-06-10":[25.0,179593],"2026-06-11":[39.58,294010],"2026-06-12":[68.75,514500],"2026-06-13":[84.38,589700],"2026-06-14":[69.79,521500],"2026-06-15":[62.5,478200],"2026-06-16":[62.5,478200],"2026-06-17":[62.5,478200],"2026-06-18":[36.46,278950],"2026-06-19":[12.5,91553],"2026-06-20":[12.5,91813],"2026-06-21":[30.21,142777],"2026-06-22":[13.54,86150],"2026-06-23":[5.21,24153],"2026-06-24":[7.29,31756],"2026-06-25":[22.92,80472],"2026-06-26":[26.04,113342],"2026-06-27":[28.13,132036],"2026-06-28":[15.63,65178],"2026-06-29":[5.21,22269],"2026-06-30":[5.21,22836],"2026-07-01":[4.17,19412],"2026-07-02":[4.17,19413],"2026-07-03":[8.33,34285],"2026-07-04":[50.0,212154],"2026-07-05":[6.25,33906],"2026-07-06":[6.25,31099],"2026-07-07":[37.5,139133],"2026-07-08":[41.67,161904],"2026-07-09":[43.75,171050],"2026-07-10":[47.92,193639],"2026-07-11":[11.46,64615],"2026-07-12":[23.96,94919],"2026-07-13":[22.92,89357],"2026-07-14":[22.92,89357],"2026-07-15":[25.0,98502],"2026-07-16":[21.88,83584],"2026-07-17":[65.63,232790],"2026-07-18":[70.83,266914],"2026-07-19":[4.17,17944],"2026-07-20":[2.08,9146],"2026-07-21":[3.13,13446],"2026-07-22":[3.13,13446],"2026-07-23":[3.13,13446],"2026-07-24":[6.25,28606],"2026-07-25":[26.04,125748],"2026-07-26":[39.58,164566],"2026-07-27":[36.46,138732],"2026-07-28":[32.29,122486],"2026-07-29":[18.75,67637],"2026-07-30":[1.04,4837],"2026-07-31":[8.33,40848],"2026-08-01":[10.42,49166],"2026-08-02":[5.21,26592],"2026-08-03":[2.08,11546],"2026-08-04":[3.13,15146],"2026-08-05":[2.08,11546],"2026-08-06":[2.08,11544],"2026-08-07":[42.71,144600],"2026-08-08":[42.71,145445],"2026-08-09":[2.08,13913],"2026-08-10":[2.08,13912],"2026-08-11":[1.04,8602],"2026-08-12":[1.04,8602],"2026-08-13":[0.0,0],"2026-08-14":[2.08,8590],"2026-08-15":[16.67,64739],"2026-08-16":[0.0,0],"2026-08-17":[1.04,4573],"2026-08-18":[0.0,0],"2026-08-19":[0.0,0],"2026-08-20":[0.0,0],"2026-08-21":[12.5,73278],"2026-08-22":[4.17,20200],"2026-08-23":[1.04,4300],"2026-08-24":[1.04,4800],"2026-08-25":[1.04,4800],"2026-08-26":[1.04,4800],"2026-08-27":[1.04,4800],"2026-08-28":[4.17,16814],"2026-08-29":[5.21,25340],"2026-08-30":[0.0,0],"2026-08-31":[0.0,0],"2026-09-01":[0.0,0],"2026-09-02":[0.0,0],"2026-09-03":[0.0,0],"2026-09-04":[2.08,8782],"2026-09-05":[3.13,14069],"2026-09-06":[3.13,11026],"2026-09-07":[11.46,39026],"2026-09-08":[4.17,18879],"2026-09-09":[4.17,18277],"2026-09-10":[1.04,3424],"2026-09-11":[29.17,120650],"2026-09-12":[21.88,98644],"2026-09-13":[15.63,67000],"2026-09-14":[0.0,0],"2026-09-15":[1.04,3877],"2026-09-16":[1.04,3877],"2026-09-17":[1.04,3877],"2026-09-18":[2.08,8222],"2026-09-19":[29.17,126983],"2026-09-20":[1.04,3877],"2026-09-21":[13.54,45877],"2026-09-22":[13.54,45877],"2026-09-23":[14.58,51184],"2026-09-24":[26.04,93277],"2026-09-25":[14.58,65407],"2026-09-26":[16.67,75744],"2026-09-27":[7.29,36532],"2026-09-28":[3.13,15612],"2026-09-29":[1.04,3878],"2026-09-30":[0.0,0],"2026-10-01":[0.0,0],"2026-10-02":[17.71,74599],"2026-10-03":[12.5,51998],"2026-10-04":[10.42,37273],"2026-10-05":[56.25,226800],"2026-10-06":[56.25,226800],"2026-10-07":[67.71,268600],"2026-10-08":[11.46,41800],"2026-10-09":[13.54,59851],"2026-10-10":[9.38,41241],"2026-10-11":[4.17,16690],"2026-10-12":[2.08,7000],"2026-10-13":[2.08,7000],"2026-10-14":[1.04,3500],"2026-10-15":[0.0,0],"2026-10-16":[5.21,20810],"2026-10-17":[13.54,52000],"2026-10-18":[2.08,9273],"2026-10-19":[0.0,0],"2026-10-20":[0.0,0],"2026-10-21":[0.0,0],"2026-10-22":[5.21,21500],"2026-10-23":[20.83,89000],"2026-10-24":[85.42,432200],"2026-10-25":[16.67,106610],"2026-10-26":[4.17,28322],"2026-10-27":[3.13,16322],"2026-10-28":[14.58,58121],"2026-10-29":[31.25,119220],"2026-10-30":[20.83,75100],"2026-10-31":[53.13,201500],"2026-11-01":[51.04,179800],"2026-11-02":[33.33,115200],"2026-11-03":[0.0,0],"2026-11-04":[0.0,0],"2026-11-05":[0.0,0],"2026-11-06":[5.21,26790],"2026-11-07":[61.46,305390],"2026-11-08":[2.08,8600],"2026-11-09":[35.42,166648],"2026-11-10":[69.79,292235],"2026-11-11":[69.79,292234],"2026-11-12":[34.38,160239],"2026-11-13":[36.46,167729],"2026-11-14":[70.83,309659],"2026-11-15":[33.33,154339],"2026-11-16":[56.25,212664],"2026-11-17":[1.04,7657],"2026-11-18":[1.04,7657],"2026-11-19":[0.0,0],"2026-11-20":[2.08,7790],"2026-11-21":[18.75,77410],"2026-11-22":[3.13,11290],"2026-11-23":[1.04,5773],"2026-11-24":[1.04,5773],"2026-11-25":[1.04,5773],"2026-11-26":[0.0,0],"2026-11-27":[52.08,199000],"2026-11-28":[55.21,212080],"2026-11-29":[52.08,200100],"2026-11-30":[50.0,192000],"2026-12-01":[50.0,192000],"2026-12-02":[50.0,192000],"2026-12-03":[50.0,192000],"2026-12-04":[51.04,195500],"2026-12-05":[52.08,199700],"2026-12-06":[2.08,7490],"2026-12-07":[1.04,3500],"2026-12-08":[1.04,3500],"2026-12-09":[0.0,0],"2026-12-10":[1.04,5124],"2026-12-11":[9.38,43287],"2026-12-12":[5.21,24455],"2026-12-13":[3.13,16094],"2026-12-14":[1.04,5125],"2026-12-15":[0.0,0],"2026-12-16":[0.0,0],"2026-12-17":[0.0,0],"2026-12-18":[2.08,16700],"2026-12-19":[18.75,75790],"2026-12-20":[1.04,3990],"2026-12-21":[0.0,0],"2026-12-22":[0.0,0],"2026-12-23":[1.04,6000],"2026-12-24":[10.42,50510],"2026-12-25":[3.13,17386],"2026-12-26":[0.0,0],"2026-12-27":[1.04,5683],"2026-12-28":[0.0,0],"2026-12-29":[0.0,0],"2026-12-30":[35.42,170000],"2026-12-31":[35.42,306000]};
+window.OD={"2026-05-01":[80.2,384979],"2026-05-02":[89.6,424952],"2026-05-03":[63.5,263943],"2026-05-04":[35.4,154273],"2026-05-05":[28.1,205205],"2026-05-06":[7.3,32863],"2026-05-07":[12.5,56738],"2026-05-08":[28.1,120725],"2026-05-09":[28.1,122519],"2026-05-10":[16.7,70700],"2026-05-11":[11.5,50300],"2026-05-12":[8.3,39104],"2026-05-13":[10.4,51925],"2026-05-14":[10.4,48881],"2026-05-15":[40.6,164395],"2026-05-16":[54.2,222549],"2026-05-17":[11.5,52879],"2026-05-18":[17.7,75731],"2026-05-19":[10.4,51038],"2026-05-20":[24.0,90580],"2026-05-21":[22.9,87080],"2026-05-22":[30.2,121258],"2026-05-23":[74.0,307657],"2026-05-24":[40.6,159635],"2026-05-25":[39.6,153504],"2026-05-26":[7.3,34830],"2026-05-27":[21.9,100908],"2026-05-28":[49.0,215387],"2026-05-29":[44.8,211465],"2026-05-30":[47.9,222956],"2026-05-31":[76.0,310452],"2026-06-01":[55.2,269515],"2026-06-02":[58.3,294172],"2026-06-03":[52.1,252104],"2026-06-04":[43.8,210191],"2026-06-05":[19.8,100726],"2026-06-06":[20.8,129937],"2026-06-07":[15.6,101012],"2026-06-08":[11.5,83200],"2026-06-09":[20.8,159400],"2026-06-10":[20.8,159400],"2026-06-11":[36.5,278950],"2026-06-12":[63.5,483800],"2026-06-13":[76.0,538000],"2026-06-14":[62.5,478200],"2026-06-15":[62.5,478200],"2026-06-16":[62.5,478200],"2026-06-17":[62.5,478200],"2026-06-18":[36.5,278950],"2026-06-19":[12.5,91553],"2026-06-20":[11.5,86953],"2026-06-21":[29.2,138094],"2026-06-22":[11.5,75694],"2026-06-23":[2.1,10273],"2026-06-24":[4.2,17876],"2026-06-25":[19.8,66592],"2026-06-26":[20.8,90638],"2026-06-27":[19.8,92810],"2026-06-28":[11.5,46623],"2026-06-29":[4.2,16497],"2026-06-30":[4.2,16498],"2026-07-01":[3.1,13074],"2026-07-02":[3.1,13074],"2026-07-03":[6.2,24295],"2026-07-04":[47.9,199378],"2026-07-05":[5.2,27568],"2026-07-06":[4.2,19283],"2026-07-07":[6.2,28218],"2026-07-08":[10.4,51555],"2026-07-09":[10.4,51555],"2026-07-10":[14.6,73572],"2026-07-11":[8.3,48449],"2026-07-12":[21.9,83424],"2026-07-13":[22.9,87008],"2026-07-14":[22.9,87008],"2026-07-15":[22.9,87008],"2026-07-16":[22.9,87008],"2026-07-17":[25.0,96214],"2026-07-18":[24.0,101830],"2026-07-19":[0.0,0],"2026-07-20":[0.0,0],"2026-07-21":[1.0,4300],"2026-07-22":[1.0,4300],"2026-07-23":[1.0,4300],"2026-07-24":[3.1,13917],"2026-07-25":[8.3,38977],"2026-07-26":[26.0,98550],"2026-07-27":[34.4,129586],"2026-07-28":[32.3,122486],"2026-07-29":[17.7,62800],"2026-07-30":[0.0,0],"2026-07-31":[5.2,23598],"2026-08-01":[6.2,28016],"2026-08-02":[2.1,11546],"2026-08-03":[2.1,11546],"2026-08-04":[2.1,11546],"2026-08-05":[2.1,11546],"2026-08-06":[2.1,11544],"2026-08-07":[1.0,4600],"2026-08-08":[1.0,5445],"2026-08-09":[2.1,13913],"2026-08-10":[2.1,13912],"2026-08-11":[1.0,8602],"2026-08-12":[1.0,8602],"2026-08-13":[0.0,0],"2026-08-14":[2.1,8590],"2026-08-15":[14.6,55942],"2026-08-16":[0.0,0],"2026-08-17":[1.0,4573],"2026-08-18":[0.0,0],"2026-08-19":[0.0,0],"2026-08-20":[0.0,0],"2026-08-21":[5.2,30448],"2026-08-22":[5.2,24358],"2026-08-23":[1.0,4300],"2026-08-24":[1.0,4800],"2026-08-25":[1.0,4800],"2026-08-26":[1.0,4800],"2026-08-27":[1.0,4800],"2026-08-28":[8.3,39418],"2026-08-29":[6.2,31346],"2026-08-30":[0.0,0],"2026-08-31":[0.0,0],"2026-09-01":[0.0,0],"2026-09-02":[0.0,0],"2026-09-03":[0.0,0],"2026-09-04":[0.0,0],"2026-09-05":[1.0,3942],"2026-09-06":[2.1,7000],"2026-09-07":[10.4,35000],"2026-09-08":[3.1,14853],"2026-09-09":[4.2,18277],"2026-09-10":[1.0,3424],"2026-09-11":[13.5,53650],"2026-09-12":[58.3,203644],"2026-09-13":[0.0,0],"2026-09-14":[0.0,0],"2026-09-15":[1.0,3877],"2026-09-16":[1.0,3877],"2026-09-17":[1.0,3877],"2026-09-18":[2.1,8222],"2026-09-19":[29.2,126983],"2026-09-20":[1.0,3877],"2026-09-21":[13.5,45877],"2026-09-22":[13.5,45877],"2026-09-23":[14.6,51184],"2026-09-24":[26.0,93277],"2026-09-25":[13.5,60275],"2026-09-26":[15.6,70612],"2026-09-27":[3.1,13799],"2026-09-28":[1.0,3878],"2026-09-29":[1.0,3878],"2026-09-30":[0.0,0],"2026-10-01":[0.0,0],"2026-10-02":[8.3,40600],"2026-10-03":[2.1,10400],"2026-10-04":[1.0,3500],"2026-10-05":[56.2,226800],"2026-10-06":[56.2,226800],"2026-10-07":[67.7,268600],"2026-10-08":[11.5,41800],"2026-10-09":[12.5,54900],"2026-10-10":[7.3,30590],"2026-10-11":[3.1,10990],"2026-10-12":[2.1,7000],"2026-10-13":[2.1,7000],"2026-10-14":[1.0,3500],"2026-10-15":[0.0,0],"2026-10-16":[4.2,17010],"2026-10-17":[13.5,52000],"2026-10-18":[1.0,3500],"2026-10-19":[0.0,0],"2026-10-20":[0.0,0],"2026-10-21":[0.0,0],"2026-10-22":[5.2,21500],"2026-10-23":[20.8,89000],"2026-10-24":[76.0,346500],"2026-10-25":[10.4,46620],"2026-10-26":[2.1,15500],"2026-10-27":[1.0,3500],"2026-10-28":[12.5,45300],"2026-10-29":[29.2,106400],"2026-10-30":[19.8,71600],"2026-10-31":[53.1,201500],"2026-11-01":[51.0,179800],"2026-11-02":[33.3,115200],"2026-11-03":[0.0,0],"2026-11-04":[0.0,0],"2026-11-05":[0.0,0],"2026-11-06":[1.0,4200],"2026-11-07":[61.5,305390],"2026-11-08":[58.3,289500],"2026-11-09":[32.3,142800],"2026-11-10":[32.3,142800],"2026-11-11":[32.3,142800],"2026-11-12":[32.3,142800],"2026-11-13":[34.4,150290],"2026-11-14":[39.6,180220],"2026-11-15":[31.2,136900],"2026-11-16":[1.0,3500],"2026-11-17":[0.0,0],"2026-11-18":[0.0,0],"2026-11-19":[0.0,0],"2026-11-20":[0.0,0],"2026-11-21":[16.7,69220],"2026-11-22":[2.1,7490],"2026-11-23":[0.0,0],"2026-11-24":[0.0,0],"2026-11-25":[0.0,0],"2026-11-26":[0.0,0],"2026-11-27":[52.1,199000],"2026-11-28":[55.2,212080],"2026-11-29":[52.1,200100],"2026-11-30":[50.0,192000],"2026-12-01":[50.0,192000],"2026-12-02":[50.0,192000],"2026-12-03":[50.0,192000],"2026-12-04":[51.0,195500],"2026-12-05":[52.1,199700],"2026-12-06":[2.1,7490],"2026-12-07":[1.0,3500],"2026-12-08":[1.0,3500],"2026-12-09":[0.0,0],"2026-12-10":[0.0,0],"2026-12-11":[0.0,0],"2026-12-12":[1.0,5700],"2026-12-13":[1.0,5700],"2026-12-14":[0.0,0],"2026-12-15":[0.0,0],"2026-12-16":[0.0,0],"2026-12-17":[0.0,0],"2026-12-18":[1.0,12500],"2026-12-19":[18.8,75790],"2026-12-20":[1.0,3990],"2026-12-21":[0.0,0],"2026-12-22":[0.0,0],"2026-12-23":[1.0,6000],"2026-12-24":[10.4,50510],"2026-12-25":[1.0,4200],"2026-12-26":[0.0,0],"2026-12-27":[0.0,0],"2026-12-28":[0.0,0],"2026-12-29":[0.0,0],"2026-12-30":[35.4,170000],"2026-12-31":[35.4,306000]};
 
+function fmtRev(n){if(n>=1000000)return(n/1000000).toFixed(1)+"M";if(n>=10000)return Math.round(n/1000)+"K";return n.toLocaleString();}
+function occColor(o){if(o>=80)return"rgba(39,174,96,0.25)";if(o>=50)return"rgba(39,174,96,0.12)";if(o>=20)return"rgba(241,196,15,0.12)";if(o>0)return"rgba(231,76,60,0.08)";return"transparent";}
 
-function renderWoW(yr, mo) {
-  if (!S.f.occ) return '';
-
-  const MN2 = ["一","二","三","四","五","六","七","八","九","十","十一","十二"];
-  const daysInMonth = new Date(yr, mo+1, 0).getDate();
-  const today = new Date(); today.setHours(0,0,0,0);
-  const mk2 = yr+'-'+String(mo+1).padStart(2,'0');
-  const budget = typeof BUDGET !== 'undefined' ? BUDGET[mk2] : null;
-
-  // Full month on-hand from window.OD
-  function calcOnHand(odSource) {
-    let occSum = 0, occCount = 0, rev = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const ds = mk2+'-'+String(d).padStart(2,'0');
-      const od = odSource[ds];
-      if (od) { rev += od[1]; if (od[0] > 0) { occSum += od[0]; occCount++; } }
-    }
-    return { occ: occCount > 0 ? occSum/occCount : 0, rev };
-  }
-
-  const curr = calcOnHand(window.OD);
-
-  // Snapshot history stored in localStorage
-  // Key: wow_history, Value: [{ts, monthData: {"2026-04": {occ, rev}, ...}}]
-  // On each upload, we push current snapshot to history
-  // WoW = curr vs snapshot closest to 7 days ago
-
-  function getHistory() {
-    try { return JSON.parse(localStorage.getItem('wow_history') || '[]'); } catch(e) { return []; }
-  }
-
-  // Find best "last week" snapshot: closest to 7 days ago (between 5-14 days ago)
-  const history = getHistory();
-  const now = Date.now();
-  const DAY = 86400000;
-  let prevSnap = null;
-  let bestDiff = Infinity;
-  history.forEach(snap => {
-    const age = now - snap.ts; // ms ago
-    if (age >= 5*DAY && age <= 21*DAY) {
-      const diff = Math.abs(age - 7*DAY);
-      if (diff < bestDiff) { bestDiff = diff; prevSnap = snap; }
-    }
-  });
-
-  const prev = prevSnap ? prevSnap.months[mk2] : null;
-  const occDiff = prev ? curr.occ - prev.occ : null;
-  const revDiff = prev ? curr.rev - prev.rev : null;
-  const revPct = (prev && prev.rev > 0) ? (curr.rev - prev.rev) / prev.rev * 100 : null;
-  const prevDate = prevSnap ? new Date(prevSnap.ts).toLocaleDateString('zh-TW', {month:'numeric',day:'numeric'}) : null;
-
-  function ppTag(diff) {
-    if (diff === null) return '<span class="wow-change wow-flat">— 累積7天以上資料後顯示</span>';
-    const cls = diff > 0.5 ? 'wow-up' : diff < -0.5 ? 'wow-down' : 'wow-flat';
-    const arrow = diff > 0.5 ? '▲' : diff < -0.5 ? '▼' : '—';
-    const sign = diff >= 0 ? '+' : '';
-    return '<span class="wow-change '+cls+'">'+arrow+' '+sign+diff.toFixed(1)+' pp vs '+prevDate+'</span>';
-  }
-
-  function pctTag(pct) {
-    if (pct === null) return '<span class="wow-change wow-flat">— 累積7天以上資料後顯示</span>';
-    const cls = pct > 1 ? 'wow-up' : pct < -1 ? 'wow-down' : 'wow-flat';
-    const arrow = pct > 1 ? '▲' : pct < -1 ? '▼' : '—';
-    const sign = pct >= 0 ? '+' : '';
-    return '<span class="wow-change '+cls+'">'+arrow+' '+sign+pct.toFixed(1)+'% vs '+prevDate+'</span>';
-  }
-
-  // Bar chart
-  let bars = '';
-  for (let d = 1; d <= daysInMonth; d++) {
-    const ds = mk2+'-'+String(d).padStart(2,'0');
-    const od = window.OD[ds];
-    const occ = od ? od[0] : 0;
-    const isFuture = new Date(yr, mo, d) > today;
-    const color = isFuture ? 'rgba(201,177,138,0.25)' :
-                  occ >= 80 ? '#e74c3c' : occ >= 50 ? '#f39c12' : occ > 0 ? '#27ae60' : 'rgba(201,177,138,0.3)';
-    bars += '<div title="'+d+'日 '+occ+'%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">'+
-      '<div style="width:100%;border-radius:2px 2px 0 0;background:'+color+';height:'+Math.max(occ*0.55,2)+'px;transition:height .3s"></div>'+
-      (d % 5 === 1 ? '<span style="font-size:8px;color:#b09a7a">'+d+'</span>' : '<span style="font-size:8px;color:transparent">·</span>')+
-    '</div>';
-  }
-
-  // Pick up needed calculation
-  const today2 = new Date(); today2.setHours(0,0,0,0);
-  const isCurrentMonth2 = yr === today2.getFullYear() && mo === today2.getMonth();
-  const isPastMonth = new Date(yr, mo+1, 0) < today2;
-  let pickupHtml = '';
-  if (budget) {
-    // Remaining days: for current month = today onwards, future = full month, past = 0
-    let remainingDays = 0;
-    if (isCurrentMonth2) {
-      // Current month: today to end of month
-      remainingDays = daysInMonth - today2.getDate() + 1;
-    } else if (!isPastMonth) {
-      // Future month: today to end of THAT month (includes remaining current month days)
-      const endOfThatMonth = new Date(yr, mo+1, 0);
-      const diffMs = endOfThatMonth - today2;
-      remainingDays = Math.ceil(diffMs / 86400000) + 1;
-    }
-
-    const occGap = budget[0] - curr.occ;
-    const revGap = budget[1] - curr.rev;
-    const dailyRevPickup = remainingDays > 0 ? revGap / remainingDays : 0;
-
-    const occNeedColor = occGap <= 0 ? '#20c997' : occGap > 15 ? '#dc3545' : '#fd7e14';
-    const revNeedColor = revGap <= 0 ? '#20c997' : revGap > budget[1]*0.2 ? '#dc3545' : '#fd7e14';
-
-    const remainingLabel = isPastMonth ? '已結束' :
-                           isCurrentMonth2 ? '本月剩餘 '+remainingDays+' 天' :
-                           '今天起共 '+remainingDays+' 天';
-
-    pickupHtml = '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">' +
-      '<div class="wow-bar-label" style="margin-bottom:10px">🎯 Pick Up 目標（' + remainingLabel + '）</div>' +
-      '<div class="wow-grid">' +
-        '<div class="wow-card">' +
-          '<div class="wow-label">' + (isPastMonth ? '最終 OCC 缺口' : '需提升 OCC') + '</div>' +
-          '<div class="wow-value" style="font-size:18px;color:' + occNeedColor + '">' +
-            (occGap <= 0 ? '已達標 ✓' : '+' + occGap.toFixed(1) + ' pp') +
-          '</div>' +
-          '<div class="wow-sub">' + (occGap <= 0 ? '超出 '+Math.abs(occGap).toFixed(1)+' pp' : '目標 '+budget[0]+'%，現 '+curr.occ.toFixed(1)+'%') + '</div>' +
-        '</div>' +
-        '<div class="wow-card">' +
-          '<div class="wow-label">' + (isPastMonth ? '最終房租缺口' : remainingDays > 0 ? '每日需補房租' : '房租缺口') + '</div>' +
-          '<div class="wow-value" style="font-size:18px;color:' + revNeedColor + '">' +
-            (revGap <= 0 ? '已達標 ✓' : remainingDays > 0 ? '+'+fmtRev(Math.round(dailyRevPickup)) : fmtRev(Math.round(revGap))) +
-          '</div>' +
-          '<div class="wow-sub">' + (revGap <= 0 ? '超出 '+fmtRev(Math.abs(Math.round(revGap))) : '共缺 '+fmtRev(Math.round(revGap))) + '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
-
-  // Budget bars
-  const budgetHtml = budget ? (() => {
-    const occTarget = budget[0], revTarget = budget[1];
-    const occPct = Math.min(curr.occ/occTarget*100, 120);
-    const revPct2 = Math.min(curr.rev/revTarget*100, 120);
-    const occColor = curr.occ >= occTarget ? '#e74c3c' : curr.occ >= occTarget*0.9 ? '#f39c12' : '#27ae60';
-    const revColor = curr.rev >= revTarget ? '#e74c3c' : curr.rev >= revTarget*0.9 ? '#f39c12' : '#27ae60';
-    return '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(201,177,138,0.3)">'+
-      '<div class="wow-bar-label" style="margin-bottom:8px">📊 Budget 達成率</div>'+
-      '<div style="margin-bottom:10px">'+
-        '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
-          '<span style="color:#8b6f47">OCC 目標 '+occTarget+'%</span>'+
-          '<span style="font-weight:700;color:'+occColor+'">'+curr.occ.toFixed(1)+'% / '+occTarget+'%</span>'+
-        '</div>'+
-        '<div style="background:rgba(201,177,138,0.2);border-radius:6px;height:10px;overflow:hidden">'+
-          '<div style="height:100%;border-radius:6px;background:'+occColor+';width:'+Math.min(occPct,100)+'%;transition:width .5s"></div>'+
-        '</div>'+
-      '</div>'+
-      '<div>'+
-        '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
-          '<span style="color:#8b6f47">房租目標 '+fmtRev(revTarget)+'</span>'+
-          '<span style="font-weight:700;color:'+revColor+'">'+fmtRev(curr.rev)+' / '+fmtRev(revTarget)+'</span>'+
-        '</div>'+
-        '<div style="background:rgba(201,177,138,0.2);border-radius:6px;height:10px;overflow:hidden">'+
-          '<div style="height:100%;border-radius:6px;background:'+revColor+';width:'+Math.min(revPct2,100)+'%;transition:width .5s"></div>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  })() : '';
-
-  return '<div class="wow-panel">'+
-    '<div class="wow-title">📈 '+MN2[mo]+'月 全月 On-Hand WoW</div>'+
-    '<div style="font-size:10px;color:#b09a7a;margin:-6px 0 12px">'+
-      (prevDate ? '對比 '+prevDate+' 上傳的數據' : '上傳7天後自動顯示 WoW 對比')+
-    '</div>'+
-    '<div class="wow-grid">'+
-      '<div class="wow-card">'+
-        '<div class="wow-label">全月 On-Hand OCC</div>'+
-        '<div class="wow-value">'+(curr.occ > 0 ? curr.occ.toFixed(1)+'%' : '—')+'</div>'+
-        '<div class="wow-sub">'+(prev ? '上週 '+prev.occ.toFixed(1)+'%' : '—')+'</div>'+
-        ppTag(occDiff)+
-      '</div>'+
-      '<div class="wow-card">'+
-        '<div class="wow-label">全月 On-Hand 房租</div>'+
-        '<div class="wow-value">'+(curr.rev > 0 ? fmtRev(curr.rev) : '—')+'</div>'+
-        '<div class="wow-sub">'+(prev ? '上週 '+fmtRev(prev.rev) : '—')+'</div>'+
-        pctTag(revPct)+
-      '</div>'+
-    '</div>'+
-    '<div style="margin-top:14px">'+
-      '<div class="wow-bar-label">'+MN2[mo]+'月每日 OCC（實際 vs 預測）</div>'+
-      '<div style="display:flex;align-items:flex-end;gap:1px;height:65px;margin-top:6px">'+bars+'</div>'+
-    '</div>'+
-    budgetHtml+
-    pickupHtml+
-  '</div>';
-}
+let S={si:0,sd:null,f:{holiday:true,wedding:true,exhibition:true,concert:true,occ:true}};
 
 function fmtRev(n){if(n>=1000000)return(n/1000000).toFixed(1)+"M";if(n>=10000)return Math.round(n/1000)+"K";return n.toLocaleString();}
 function occColor(o){if(o>=80)return"rgba(231,76,60,0.25)";if(o>=50)return"rgba(241,196,15,0.12)";if(o>=20)return"rgba(39,174,96,0.12)";if(o>0)return"rgba(39,174,96,0.08)";return"transparent";}
 
-let S={si:0,sd:null,f:{holiday:true,wedding:true,exhibition:true,concert:true,occ:true}};
+function renderWoW(yr, mo) {
+  if (!S.f.occ) return '';
+  const MN2 = ["一","二","三","四","五","六","七","八","九","十","十一","十二"];
+  const daysInMonth = new Date(yr, mo+1, 0).getDate();
+  const mk2 = yr+'-'+String(mo+1).padStart(2,'0');
+  const budget = typeof BUDGET !== 'undefined' ? BUDGET[mk2] : null;
+  function calcOnHand() {
+    let occSum=0,occCount=0,rev=0;
+    for(let d=1;d<=daysInMonth;d++){const ds=mk2+'-'+String(d).padStart(2,'0');const od=window.OD[ds];if(od){rev+=od[1];if(od[0]>0){occSum+=od[0];occCount++;}}}
+    return{occ:occCount>0?occSum/occCount:0,rev};
+  }
+  const curr=calcOnHand();
+  function getHistory(){try{return JSON.parse(localStorage.getItem('wow_history')||'[]');}catch(e){return[];}}
+  const history=getHistory(),now=Date.now(),DAY=86400000;
+  let prevSnap=null,bestDiff=Infinity;
+  history.forEach(snap=>{const age=now-snap.ts;if(age>=5*DAY&&age<=21*DAY){const diff=Math.abs(age-7*DAY);if(diff<bestDiff){bestDiff=diff;prevSnap=snap;}}});
+  const prev=prevSnap?prevSnap.months[mk2]:null;
+  const occDiff=prev?curr.occ-prev.occ:null;
+  const revPct=(prev&&prev.rev>0)?(curr.rev-prev.rev)/prev.rev*100:null;
+  const prevDate=prevSnap?new Date(prevSnap.ts).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}):null;
+  function ppTag(diff){if(diff===null)return'<span class="wow-change wow-flat">— 累積7天後顯示</span>';const cls=diff>0.5?'wow-up':diff<-0.5?'wow-down':'wow-flat';const arrow=diff>0.5?'▲':diff<-0.5?'▼':'—';const sign=diff>=0?'+':'';return'<span class="wow-change '+cls+'">'+arrow+' '+sign+diff.toFixed(1)+' pp vs '+prevDate+'</span>';}
+  function pctTag(pct){if(pct===null)return'<span class="wow-change wow-flat">— 累積7天後顯示</span>';const cls=pct>1?'wow-up':pct<-1?'wow-down':'wow-flat';const arrow=pct>1?'▲':pct<-1?'▼':'—';const sign=pct>=0?'+':'';return'<span class="wow-change '+cls+'">'+arrow+' '+sign+pct.toFixed(1)+'% vs '+prevDate+'</span>';}
+  // bar chart
+  const today=new Date();today.setHours(0,0,0,0);
+  const pullD=window.OCC_PULL_DATE?new Date(window.OCC_PULL_DATE):today;
+  let bars='';
+  for(let d=1;d<=daysInMonth;d++){const ds=mk2+'-'+String(d).padStart(2,'0');const od=window.OD[ds];const occ=od?od[0]:0;const isFuture=new Date(yr,mo,d)>=pullD;const color=isFuture?'rgba(201,177,138,0.25)':occ>=80?'#e74c3c':occ>=50?'#f39c12':occ>0?'#27ae60':'rgba(201,177,138,0.3)';bars+='<div title="'+d+'日 '+occ+'%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px"><div style="width:100%;border-radius:2px 2px 0 0;background:'+color+';height:'+Math.max(occ*0.55,2)+'px;transition:height .3s"></div>'+(d%5===1?'<span style="font-size:8px;color:#b09a7a">'+d+'</span>':'<span style="font-size:8px;color:transparent">·</span>')+'</div>';}
+  // pickup
+  const today2=window.OCC_PULL_DATE?(()=>{const d=new Date(window.OCC_PULL_DATE);d.setHours(0,0,0,0);return d;})():(()=>{const d=new Date();d.setHours(0,0,0,0);return d;})();
+  const isCurrentMonth2=yr===today2.getFullYear()&&mo===today2.getMonth();
+  const isPastMonth=new Date(yr,mo+1,0)<today2;
+  let pickupHtml='';
+  if(budget){
+    let remainingDays=0;
+    if(isCurrentMonth2){remainingDays=daysInMonth-today2.getDate()+1;}
+    else if(!isPastMonth){const end=new Date(yr,mo+1,0);remainingDays=Math.ceil((end-today2)/86400000)+1;}
+    const occGap=budget[0]-curr.occ,revGap=budget[1]-curr.rev;
+    const dailyRevPickup=remainingDays>0?revGap/remainingDays:0;
+    const occColor2=occGap<=0?'#20c997':occGap>15?'#dc3545':'#fd7e14';
+    const revColor2=revGap<=0?'#20c997':revGap>budget[1]*0.2?'#dc3545':'#fd7e14';
+    const lbl=isPastMonth?'已結束':isCurrentMonth2?'本月剩餘 '+remainingDays+' 天':'今天起共 '+remainingDays+' 天';
+    pickupHtml='<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"><div class="wow-bar-label" style="margin-bottom:10px">🎯 Pick Up 目標（'+lbl+'）</div><div class="wow-grid"><div class="wow-card"><div class="wow-label">'+(isPastMonth?'最終 OCC 缺口':'需提升 OCC')+'</div><div class="wow-value" style="font-size:18px;color:'+occColor2+'">'+(occGap<=0?'已達標 ✓':'+'+occGap.toFixed(1)+' pp')+'</div><div class="wow-sub">'+(occGap<=0?'超出 '+Math.abs(occGap).toFixed(1)+' pp':'目標 '+budget[0]+'%，現 '+curr.occ.toFixed(1)+'%')+'</div></div><div class="wow-card"><div class="wow-label">'+(isPastMonth?'最終房租缺口':remainingDays>0?'每日需補房租':'房租缺口')+'</div><div class="wow-value" style="font-size:18px;color:'+revColor2+'">'+(revGap<=0?'已達標 ✓':remainingDays>0?'+'+fmtRev(Math.round(dailyRevPickup)):fmtRev(Math.round(revGap)))+'</div><div class="wow-sub">'+(revGap<=0?'超出 '+fmtRev(Math.abs(Math.round(revGap))):'共缺 '+fmtRev(Math.round(revGap)))+'</div></div></div></div>';
+  }
+  // budget bars
+  const budgetHtml=budget?(()=>{const ot=budget[0],rt=budget[1];const op=Math.min(curr.occ/ot*100,120),rp=Math.min(curr.rev/rt*100,120);const oc=curr.occ>=ot?'#e74c3c':curr.occ>=ot*0.9?'#f39c12':'#27ae60';const rc=curr.rev>=rt?'#e74c3c':curr.rev>=rt*0.9?'#f39c12':'#27ae60';return'<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"><div class="wow-bar-label" style="margin-bottom:8px">📊 Budget 達成率</div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text-secondary)">OCC 目標 '+ot+'%</span><span style="font-weight:700;color:'+oc+'">'+curr.occ.toFixed(1)+'% / '+ot+'%</span></div><div style="background:var(--surface2);border-radius:6px;height:10px;overflow:hidden"><div style="height:100%;border-radius:6px;background:'+oc+';width:'+Math.min(op,100)+'%;transition:width .5s"></div></div></div><div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text-secondary)">房租目標 '+fmtRev(rt)+'</span><span style="font-weight:700;color:'+rc+'">'+fmtRev(curr.rev)+' / '+fmtRev(rt)+'</span></div><div style="background:var(--surface2);border-radius:6px;height:10px;overflow:hidden"><div style="height:100%;border-radius:6px;background:'+rc+';width:'+Math.min(rp,100)+'%;transition:width .5s"></div></div></div></div>';})():'';
+  return'<div class="wow-panel"><div class="wow-title">📈 '+MN2[mo]+'月 全月 On-Hand WoW</div><div style="font-size:10px;color:var(--text-muted);margin:-6px 0 12px">'+(prevDate?'對比 '+prevDate+' 上傳的數據':'上傳7天後自動顯示 WoW 對比')+'</div><div class="wow-grid"><div class="wow-card"><div class="wow-label">全月 On-Hand OCC</div><div class="wow-value">'+(curr.occ>0?curr.occ.toFixed(1)+'%':'—')+'</div><div class="wow-sub">'+(prev?'上週 '+prev.occ.toFixed(1)+'%':'—')+'</div>'+ppTag(occDiff)+'</div><div class="wow-card"><div class="wow-label">全月 On-Hand 房租</div><div class="wow-value">'+(curr.rev>0?fmtRev(curr.rev):'—')+'</div><div class="wow-sub">'+(prev?'上週 '+fmtRev(prev.rev):'—')+'</div>'+pctTag(revPct)+'</div></div><div style="margin-top:14px"><div class="wow-bar-label">'+MN2[mo]+'月每日 OCC</div><div style="display:flex;align-items:flex-end;gap:1px;height:65px;margin-top:6px">'+bars+'</div></div>'+budgetHtml+pickupHtml+'</div>';
+}
 
+function showDayPopup(yr, mo, d) {
+  const W2=['日','一','二','三','四','五','六'];
+  const dow=new Date(yr,mo,d).getDay();
+  const dk2=yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  const mk2=yr+'-'+String(mo+1).padStart(2,'0');
+  const hol=H[dk2],wed=(WD[mk2]||[]).includes(d),od=window.OD[dk2];
+  function matchDay(p){const mn=mo+1;const rM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);if(rM){const[,sm,sd2,em,ed]=rM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}const sM=p.match(/(\d+)\/(\d+)/g);if(sM)return sM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});return false;}
+  const dayEx=(EX[mk2]||[]).filter(e=>matchDay(e.p||''));
+  const dayCo=(CO[mk2]||[]).filter(e=>matchDay(e.p||''));
+  let html='<div class="popup-overlay" onclick="if(event.target===this)closeDayPopup()"><div class="popup">';
+  html+='<div class="popup-header"><div><span class="popup-date">'+yr+' / '+(mo+1)+' / '+d+'</span><span class="popup-dow">週'+W2[dow]+'</span></div><button class="popup-close" onclick="closeDayPopup()">✕</button></div>';
+  html+='<div class="popup-body">';
+  let hasContent=false;
+  if(od&&S.f.occ){hasContent=true;const occ=od[0],rev=od[1];const oc=occ>=80?'#dc3545':occ>=50?'#fd7e14':'#20c997';html+='<div class="popup-section"><div class="popup-section-title">住房率</div><div class="popup-occ-row"><div class="popup-occ-card"><div class="popup-occ-label">OCC</div><div class="popup-occ-val" style="color:'+oc+'">'+occ+'%</div></div><div class="popup-occ-card"><div class="popup-occ-label">總房租</div><div class="popup-occ-val" style="font-size:15px">$'+rev.toLocaleString()+'</div></div></div></div>';}
+  if((hol&&S.f.holiday)||(wed&&S.f.wedding)){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">特殊日期</div>';if(hol&&S.f.holiday)html+='<div class="popup-row"><span class="popup-row-icon">🏮</span><div class="popup-row-content"><div class="popup-row-name" style="color:#dc3545">'+hol+'</div></div></div>';if(wed&&S.f.wedding)html+='<div class="popup-row"><span class="popup-row-icon">💍</span><div class="popup-row-content"><div class="popup-row-name" style="color:#d63384">宜嫁娶吉日</div></div></div>';html+='</div>';}
+  if(dayEx.length>0&&S.f.exhibition){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">展覽</div>';dayEx.forEach(e=>{html+='<div class="popup-row"><span class="popup-row-icon">🎨</span><div class="popup-row-content"><div class="popup-row-name">'+e.n+'</div><div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div></div></div>';});html+='</div>';}
+  if(dayCo.length>0&&S.f.concert){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">演唱會</div>';dayCo.forEach(e=>{html+='<div class="popup-row"><span class="popup-row-icon">🎤</span><div class="popup-row-content"><div class="popup-row-name">'+e.n+'</div><div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div></div></div>';});html+='</div>';}
+  if(!hasContent)html+='<div class="popup-empty">無特殊事項</div>';
+  html+='</div></div></div>';
+  const old=document.getElementById('day-popup');if(old)old.remove();
+  const el=document.createElement('div');el.id='day-popup';el.innerHTML=html;document.body.appendChild(el);
+}
+function closeDayPopup(){const el=document.getElementById('day-popup');if(el)el.remove();S.sd=null;}
 
 window.render=function render(){
 const{si,sd,f}=S,{y:yr,m:mo}=ML[si],dm=dim(yr,mo),f1=fdm(yr,mo);
 const mEx=EX[mk(yr,mo)]||[],mCo=CO[mk(yr,mo)]||[];
 const sH=sd?H[dk(yr,mo,sd)]:null,sW=sd&&(WD[mk(yr,mo)]||[]).includes(sd);
-const sOD=sd?window.OD[dk(yr,mo,sd)]:null;
-let h=`<div class="app-shell"><div class="header"><div class="header-left"><h1>2026–2027 年曆</h1><p>2026 丙午馬年 → 2027 丁未羊年（雙春年）</p></div></div>`;
+const sOD=sd?OD[dk(yr,mo,sd)]:null;
+let h=`<div class="header"><h1>2026–2027 年曆</h1><p>2026 丙午馬年 → 2027 丁未羊年（雙春年）</p></div>`;
 h+=`<div class="filters">`;
 [{k:"holiday",l:"國定假日",c:FC.holiday,i:"🏮"},{k:"wedding",l:"宜嫁娶",c:FC.wedding,i:"💍"},{k:"exhibition",l:"展覽",c:FC.exhibition,i:"🎨"},{k:"concert",l:"演唱會",c:FC.concert,i:"🎤"},{k:"occ",l:"住房率",c:"#27ae60",i:"🏨"}].forEach(x=>{
-const on=f[x.k];h+=`<button class="fb ${on?"active":""}" onclick="tf('${x.k}')" style="${on?"background:"+x.c+";border-color:"+x.c:""}"><span>${x.i}</span><span class="fb-label">${x.l}</span></button>`;});
-h+=`</div><div class="nav-bar"><div style="display:flex;gap:4px">`;
-[2026,2027].forEach(y=>{const a=yr===y;h+=`<button class="yb ${a?"active":""}" onclick="sY(${y})">${y}</button>`;});
-h+=`</div><div class="month-scroll">`;
-ML.filter(m=>m.y===yr).forEach(m=>{const gi=ML.indexOf(m),a=si===gi;h+=`<button class="mb ${a?"active":""}" onclick="sM(${gi})">${MN[m.m]}</button>`;});
-h+=`</div></div><div class="cal-wrap"><div class="cal-header"><button class="cal-nav-btn" onclick="sM(${si>0?si-1:si})">‹</button><span class="ct">${yr} ${MN[mo]}</span><button class="cal-nav-btn" onclick="sM(${si<ML.length-1?si+1:si})">›</button></div><div class="cg">`;
-W.forEach((w,i)=>{h+=`<div class="wh" style="${i===0||i===6?"color:var(--red)":""}">${w}</div>`;});
+const on=f[x.k];h+=`<button class="fb" onclick="tf('${x.k}')" style="border-color:${x.c};background:${on?x.c:"transparent"};color:${on?"#fff":x.c}"><span>${x.i}</span>${x.l}</button>`;});
+h+=`</div><div class="yt">`;
+[2026,2027].forEach(y=>{const a=yr===y;h+=`<button class="yb" onclick="sY(${y})" style="border:${a?"2px solid #2c1810":"1px solid #c9b18a"};background:${a?"#2c1810":"transparent"};color:${a?"#fdf6ec":"#5a4230"}">${y}</button>`;});
+h+=`</div><div class="ms">`;
+ML.filter(m=>m.y===yr).forEach(m=>{const gi=ML.indexOf(m),a=si===gi;h+=`<button class="mb" onclick="sM(${gi})" style="border:${a?"2px solid #2c1810":"1px solid #c9b18a"};background:${a?"#2c1810":"rgba(255,255,255,0.5)"};color:${a?"#fdf6ec":"#5a4230"};font-weight:${a?700:400}">${MN[m.m]}</button>`;});
+h+=`</div><div class="cw"><h2 class="ct">${yr} ${MN[mo]}</h2><div class="cg" style="margin-bottom:4px">`;
+W.forEach((w,i)=>{h+=`<div class="wh" style="color:${i===0||i===6?"#c0392b":"#8b6f47"}">${w}</div>`;});
 h+=`</div><div class="cg">`;
-for(let i=0;i<f1;i++)h+=`<div style="border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface2)"></div>`;
+for(let i=0;i<f1;i++)h+=`<div></div>`;
 for(let d=1;d<=dm;d++){
 const hol=H[dk(yr,mo,d)],wed=(WD[mk(yr,mo)]||[]).includes(d),dow=new Date(yr,mo,d).getDay(),we=dow===0||dow===6,sel=sd===d;
 const sHol=f.holiday&&hol,sWed=f.wedding&&wed;
-const od=window.OD[dk(yr,mo,d)],showOcc=f.occ&&od;
-let extraClass=we?"weekend":"",bg="",tc="",bd="none";
-// Mark forecast days (on or after pull date)
-const isForecast = window.OCC_PULL_DATE && dk >= window.OCC_PULL_DATE;
-if(showOcc&&od[0]>0)bg=isForecast?"":occColor(od[0]);
-if(sHol)extraClass+=" holiday";
-if(isForecast)extraClass+=" forecast";
-if(sel)extraClass+=" selected";
-// Build event labels for this day
-const dayEx=(EX[mk(yr,mo)]||[]).filter(e=>{
-  if(!f.exhibition)return false;
-  const p=e.p||'';
-  const mn=mo+1;
-  // Check if day d falls within date range like "6/2~6/5"
-  const rangeM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);
-  if(rangeM){const[,sm,sd2,em,ed]=rangeM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}
-  const singleM=p.match(/(\d+)\/(\d+)/g);
-  if(singleM)return singleM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});
-  return false;
-});
-const dayCo=(CO[mk(yr,mo)]||[]).filter(e=>{
-  if(!f.concert)return false;
-  const p=e.p||'';
-  const mn=mo+1;
-  const rangeM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);
-  if(rangeM){const[,sm,sd2,em,ed]=rangeM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}
-  const singleM=p.match(/(\d+)\/(\d+)/g);
-  if(singleM)return singleM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});
-  return false;
-});
-// Build dots for mobile
-let dotsHtml='<div class="dots-row">';
-if(sHol&&f.holiday)dotsHtml+=`<span class="dot" style="background:#dc3545"></span>`;
-if(sWed&&f.wedding)dotsHtml+=`<span class="dot" style="background:#d63384"></span>`;
-// Will add ex/co dots after filtering
-h+=`<button class="dc ${extraClass}" onclick="sD(${d})" style="${bg?"background:"+bg:""}"><span class="day-num">${d}</span>`;
-if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,0.8)":od[0]>=80?"#dc3545":od[0]>=50?"#fd7e14":"#20c997"}">${od[0]}%</span>`;
-// Holiday name
-if(sHol)h+=`<span class="ev hol">🏮${hol}</span>`;
-// Wedding
-if(sWed)h+=`<span class="ev wed">💍宜嫁娶</span>`;
-// Exhibitions
-dayEx.forEach(e=>{
-  h+=`<span class="ev ex">🎨${e.n.replace(/（.*?）/g,'').replace(/台北國際/g,'').replace(/展覽會/g,'展').slice(0,8)}</span>`;
-});
-// Concerts
-dayCo.forEach(e=>{
-  h+=`<span class="ev co">🎤${e.n.replace(/演唱會/g,'').replace(/巡迴/g,'').replace(/世界/g,'').slice(0,8)}</span>`;
-  dotsHtml+=`<span class="dot" style="background:#6f42c1"></span>`;
-});
-dayEx.forEach(e=>{dotsHtml+=`<span class="dot" style="background:#0d6efd"></span>`;});
-dotsHtml+='</div>';
-h+=dotsHtml+`</button>`;}
+const od=OD[dk(yr,mo,d)],showOcc=f.occ&&od;
+let bg="transparent",tc=we?"#c0392b":"#2c1810",bd="2px solid transparent";
+if(showOcc&&od[0]>0)bg=occColor(od[0]);
+if(sHol){bg="rgba(231,76,60,0.18)";tc="#c0392b";}
+if(sel){bd="2px solid #2c1810";bg="#2c1810";tc="#fdf6ec";}
+h+=`<button class="dc" onclick="sD(${d})" style="border:${bd};background:${bg};color:${tc};font-weight:${hol?800:500}">${d}`;
+if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,.7)":od[0]>=50?"#27ae60":"#e67e22"}">${od[0]}%</span>`;
+h+=`<div class="dots">`;
+if(sHol)h+=`<span class="dot" style="background:${sel?"#ff6b6b":FC.holiday}"></span>`;
+if(sWed)h+=`<span class="dot" style="background:${sel?"#ff69b4":FC.wedding}"></span>`;
+h+=`</div></button>`;}
 h+=`</div></div>`;
+if(sd){
+h+=`<div class="pn" style="background:rgba(255,255,255,0.7);box-shadow:0 2px 12px rgba(44,24,16,0.06)"><h3 style="color:#2c1810;font-size:16px;letter-spacing:2px">${yr}/${mo+1}/${sd} <span style="font-size:13px;color:#8b6f47;margin-left:8px">${W[new Date(yr,mo,sd).getDay()]}</span></h3><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">`;
+if(sH)h+=`<div class="bd" style="background:rgba(231,76,60,0.1);color:#c0392b">🏮 ${sH}</div>`;
+if(sW)h+=`<div class="bd" style="background:rgba(233,30,142,0.1);color:#e91e8e">💍 宜嫁娶</div>`;
+h+=`</div>`;
+if(sOD)h+=`<div class="rev-detail">🏨 住房率 ${sOD[0]}% ｜ 總房租 $${sOD[1].toLocaleString()}</div>`;
+if(!sH&&!sW&&!sOD)h+=`<p style="color:#8b6f47;font-size:13px;margin-top:4px">無特殊事項</p>`;
+h+=`</div>`;}
+if(f.exhibition&&mEx.length>0){
+h+=`<div class="pn" style="background:rgba(41,128,185,0.06);border:1px solid rgba(41,128,185,0.2)"><h3 style="color:#2980b9">🎨 ${MN[mo]}展覽</h3>`;
+mEx.forEach((e,i)=>{const last=i===mEx.length-1;h+=`<div class="pi" style="${last?"margin:0;padding:0;border:none":"border-bottom:1px solid rgba(41,128,185,0.12)"}"><div style="font-weight:700;color:#1a5276;font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${e.n}${e.v.includes("南港")?`<span class="tg" style="background:#1abc9c">南港展覽館</span>`:""}</div><div style="font-size:12px;color:#5d7d8f;margin-top:2px">📍 ${e.v} ・ ${e.p}</div></div>`;});h+=`</div>`;}
+if(f.concert&&(mCo.length>0||CTBD.length>0)){
+h+=`<div class="pn" style="background:rgba(142,68,173,0.06);border:1px solid rgba(142,68,173,0.2)"><h3 style="color:#8e44ad">🎤 ${mCo.length>0?MN[mo]+"演唱會":"演唱會動態"}</h3>`;
+mCo.forEach(c=>{h+=`<div class="pi" style="border-bottom:1px solid rgba(142,68,173,0.12)"><div style="font-weight:700;color:#6c3483;font-size:14px">${c.n}</div><div style="font-size:12px;color:#7d6b8a;margin-top:2px">📍 ${c.v} ・ ${c.p}</div></div>`;});
+CTBD.forEach(c=>{h+=`<div><div style="font-weight:700;color:#6c3483;font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${c.n}<span class="tg" style="background:#f39c12">日期待公布</span></div><div style="font-size:12px;color:#7d6b8a;margin-top:2px">📍 ${c.v} ・ ${c.p}</div></div>`;});h+=`</div>`;}
+const wd=WD[mk(yr,mo)];
+if(f.wedding&&wd&&wd.length>0){
+h+=`<div class="pn" style="background:rgba(233,30,142,0.04);border:1px solid rgba(233,30,142,0.15)"><h3 style="color:#e91e8e">💍 ${MN[mo]}宜嫁娶吉日</h3><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
+wd.forEach(d=>{const dn=W[new Date(yr,mo,d).getDay()],s2=sd===d;h+=`<span class="wc" onclick="sD(${d})" style="background:${s2?"#e91e8e":"rgba(233,30,142,0.1)"};color:${s2?"#fff":"#c0176e"}">${d}日（${dn}）</span>`;});h+=`</div></div>`;}
 h+=renderWoW(yr,mo);
-
-
 h+=`</div></div><div class="ft"><p id="last-update-date">__LAST_UPDATE__</p><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
-// Inject dynamic date
-const pullDate = window.OCC_PULL_DATE || localStorage.getItem('occ_pull_date');
-const uploadTs = localStorage.getItem('occ_upload_ts');
-let dateText = pullDate ? '' : '資料載入中...';
-if (pullDate) {
-  const [py,pm,pd] = pullDate.split('-');
-  dateText = '資料截至：'+py+'年'+parseInt(pm)+'月'+parseInt(pd)+'日'+(uploadTs?'　上傳：'+uploadTs:'');
-}
-h = h.replace('__LAST_UPDATE__', dateText);
+const pullDate=window.OCC_PULL_DATE||localStorage.getItem('occ_pull_date');
+const uploadTs=localStorage.getItem('occ_upload_ts');
+let dateText='資料載入中...';
+if(pullDate){const[py,pm,pd]=pullDate.split('-');dateText='資料截至：'+py+'年'+parseInt(pm)+'月'+parseInt(pd)+'日'+(uploadTs?'　上傳：'+uploadTs:'');}
+h=h.replace('__LAST_UPDATE__',dateText);
 document.getElementById("app").innerHTML=h;}
-
-function showDayPopup(yr, mo, d) {
-  const W2 = ['日','一','二','三','四','五','六'];
-  const MN2 = ["一","二","三","四","五","六","七","八","九","十","十一","十二"];
-  const dow = new Date(yr, mo, d).getDay();
-  const dk2 = yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-  const mk2 = yr+'-'+String(mo+1).padStart(2,'0');
-  const hol = H[dk2];
-  const wed = (WD[mk2]||[]).includes(d);
-  const od = window.OD[dk2];
-  const isWe = dow===0||dow===6;
-
-  // Filter events for this day
-  function matchDay(p) {
-    const mn = mo+1;
-    const rangeM = p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);
-    if(rangeM){const[,sm,sd2,em,ed]=rangeM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}
-    const singles = p.match(/(\d+)\/(\d+)/g);
-    if(singles)return singles.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});
-    return false;
-  }
-  const dayEx = (EX[mk2]||[]).filter(e=>matchDay(e.p||''));
-  const dayCo = (CO[mk2]||[]).filter(e=>matchDay(e.p||''));
-
-  let html = '<div class="popup-overlay" onclick="if(event.target===this)closeDayPopup()">';
-  html += '<div class="popup">';
-
-  // Header
-  html += '<div class="popup-header">';
-  html += '<div><span class="popup-date">'+yr+' / '+(mo+1)+' / '+d+'</span><span class="popup-dow">週'+W2[dow]+'</span></div>';
-  html += '<button class="popup-close" onclick="closeDayPopup()">✕</button>';
-  html += '</div>';
-
-  html += '<div class="popup-body">';
-
-  let hasContent = false;
-
-  // OCC data
-  if(od && S.f.occ) {
-    hasContent = true;
-    const occ = od[0], rev = od[1];
-    const occColor = occ>=80?'#dc3545':occ>=50?'#fd7e14':'#20c997';
-    html += '<div class="popup-section">';
-    html += '<div class="popup-section-title">住房率</div>';
-    html += '<div class="popup-occ-row">';
-    html += '<div class="popup-occ-card"><div class="popup-occ-label">OCC</div><div class="popup-occ-val" style="color:'+occColor+'">'+occ+'%</div></div>';
-    html += '<div class="popup-occ-card"><div class="popup-occ-label">總房租</div><div class="popup-occ-val" style="font-size:15px;color:var(--text-primary)">$'+rev.toLocaleString()+'</div></div>';
-    html += '</div></div>';
-  }
-
-  // Holiday / Wedding
-  if((hol && S.f.holiday) || (wed && S.f.wedding)) {
-    hasContent = true;
-    html += '<div class="popup-section">';
-    html += '<div class="popup-section-title">特殊日期</div>';
-    if(hol && S.f.holiday) html += '<div class="popup-row"><span class="popup-row-icon">🏮</span><div class="popup-row-content"><div class="popup-row-name" style="color:#dc3545">'+hol+'</div></div></div>';
-    if(wed && S.f.wedding) html += '<div class="popup-row"><span class="popup-row-icon">💍</span><div class="popup-row-content"><div class="popup-row-name" style="color:#d63384">宜嫁娶吉日</div></div></div>';
-    html += '</div>';
-  }
-
-  // Exhibitions
-  if(dayEx.length > 0 && S.f.exhibition) {
-    hasContent = true;
-    html += '<div class="popup-section">';
-    html += '<div class="popup-section-title">展覽</div>';
-    dayEx.forEach(e => {
-      html += '<div class="popup-row"><span class="popup-row-icon">🎨</span><div class="popup-row-content">';
-      html += '<div class="popup-row-name">'+e.n+'</div>';
-      html += '<div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div>';
-      html += '</div></div>';
-    });
-    html += '</div>';
-  }
-
-  // Concerts
-  if(dayCo.length > 0 && S.f.concert) {
-    hasContent = true;
-    html += '<div class="popup-section">';
-    html += '<div class="popup-section-title">演唱會</div>';
-    dayCo.forEach(e => {
-      html += '<div class="popup-row"><span class="popup-row-icon">🎤</span><div class="popup-row-content">';
-      html += '<div class="popup-row-name">'+e.n+'</div>';
-      html += '<div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div>';
-      html += '</div></div>';
-    });
-    html += '</div>';
-  }
-
-  if(!hasContent) {
-    html += '<div class="popup-empty">無特殊事項</div>';
-  }
-
-  html += '</div></div></div>';
-
-  // Remove existing popup
-  const old = document.getElementById('day-popup');
-  if(old) old.remove();
-  const el = document.createElement('div');
-  el.id = 'day-popup';
-  el.innerHTML = html;
-  document.body.appendChild(el);
-}
-
-function closeDayPopup() {
-  const el = document.getElementById('day-popup');
-  if(el) el.remove();
-  S.sd = null;
-}
-
 function tf(k){S.f[k]=!S.f[k];render();}
 function sY(y){S.si=ML.findIndex(m=>m.y===y);S.sd=null;render();}
 function sM(i){S.si=i;S.sd=null;render();}
 function sD(d){const{y:yr,m:mo}=ML[S.si];showDayPopup(yr,mo,d);S.sd=d;render();}
-render();
+window.render();
 </script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAeEhCWqFUthxYfgMuma_eF2dojl_Ixd2E",
-  authDomain: "annual-calendar-c770e.firebaseapp.com",
-  projectId: "annual-calendar-c770e",
-  storageBucket: "annual-calendar-c770e.firebasestorage.app",
-  messagingSenderId: "498861472239",
-  appId: "1:498861472239:web:fc4851c4c2f92f09039e1a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const ADMIN_PW = "3333";
-
-// Load OCC data from Firestore and merge into OD
-async function loadFirestoreOCC() {
-  try {
-    const snap = await getDocs(collection(db, "occ_data"));
-    if (!snap.empty) {
-      let totalKeys = 0;
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
-        // Firestore may return keys in any format - ensure they match YYYY-MM-DD
-        Object.entries(data).forEach(([k, v]) => {
-          // Normalize key: ensure format is YYYY-MM-DD
-          let key = k;
-          if (/^\d{8}$/.test(k)) {
-            // Convert 20260401 -> 2026-04-01
-            key = k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);
-          }
-          window.OD[key] = v;
-          totalKeys++;
-        });
-      });
-      // Restore pull date from Firestore meta
-      try {
-        const metaSnap = await getDoc(doc(db, "meta", "info"));
-        if (metaSnap.exists()) {
-          const meta = metaSnap.data();
-          if (meta.pullDate) {
-            window.OCC_PULL_DATE = meta.pullDate;
-            localStorage.setItem('occ_pull_date', meta.pullDate);
-          }
-          if (meta.lastUpdated) {
-            const d = new Date(meta.lastUpdated);
-            const ts = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
-            localStorage.setItem('occ_upload_ts', ts);
-          }
-        }
-      } catch(e) { console.warn('Meta load failed:', e); }
-      console.log("✅ Firestore OCC loaded:", totalKeys, "entries, pull date:", window.OCC_PULL_DATE);
+const firebaseConfig={apiKey:"AIzaSyAeEhCWqFUthxYfgMuma_eF2dojl_Ixd2E",authDomain:"annual-calendar-c770e.firebaseapp.com",projectId:"annual-calendar-c770e",storageBucket:"annual-calendar-c770e.firebasestorage.app",messagingSenderId:"498861472239",appId:"1:498861472239:web:fc4851c4c2f92f09039e1a"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const ADMIN_PW="3333";
+async function loadFirestoreOCC(){
+  try{
+    const snap=await getDocs(collection(db,"occ_data"));
+    if(!snap.empty){
+      let total=0;
+      snap.forEach(ds=>{Object.entries(ds.data()).forEach(([k,v])=>{let key=k;if(/^\d{8}$/.test(k))key=k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);window.OD[key]=v;total++;});});
+      try{const ms=await getDoc(doc(db,"meta","info"));if(ms.exists()){const m=ms.data();if(m.pullDate){window.OCC_PULL_DATE=m.pullDate;localStorage.setItem('occ_pull_date',m.pullDate);}if(m.lastUpdated){const d=new Date(m.lastUpdated);localStorage.setItem('occ_upload_ts',d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日');}}}catch(e){}
+      console.log("✅ Firestore loaded:",total,"entries");
       window.render();
-    } else {
-      console.log("ℹ️ Firestore OCC: no data found");
     }
-  } catch(e) {
-    console.warn("Firestore load failed:", e);
-  }
+  }catch(e){console.warn("Firestore load failed:",e);}
 }
-
-// Upload OCC data to Firestore (admin only)
-window.uploadToFirestore = async function(occData, uploadDateKey) {
-  // Split into chunks of 100 dates per document (Firestore 1MB limit)
-  const entries = Object.entries(occData);
-  const chunkSize = 100;
-  for (let i = 0; i < entries.length; i += chunkSize) {
-    const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
-    const docId = "occ_" + Math.floor(i / chunkSize);
-    await setDoc(doc(db, "occ_data", docId), chunk);
-  }
-  // Save upload timestamp
-  await setDoc(doc(db, "meta", "info"), {
-    lastUpdated: new Date().toISOString(),
-    uploadedBy: "admin",
-    pullDate: uploadDateKey || null
-  });
+window.uploadToFirestore=async function(occData,uploadDateKey){
+  const entries=Object.entries(occData);
+  for(let i=0;i<entries.length;i+=100){await setDoc(doc(db,"occ_data","occ_"+Math.floor(i/100)),Object.fromEntries(entries.slice(i,i+100)));}
+  await setDoc(doc(db,"meta","info"),{lastUpdated:new Date().toISOString(),uploadedBy:"admin",pullDate:uploadDateKey||null});
 };
-
-// Admin UI logic
-window.showAdminPanel = function() {
-  const pw = prompt("請輸入管理員密碼：");
-  if (pw !== ADMIN_PW) {
-    if (pw !== null) alert("密碼錯誤！");
-    return;
-  }
-  document.getElementById("admin-panel").style.display = "block";
-};
-
-window.handleExcelUpload = async function(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const statusEl = document.getElementById("upload-status");
-  statusEl.textContent = "⏳ 讀取中...";
-  statusEl.style.color = "#8b6f47";
-
-  try {
-    const XLSX = window.XLSX;
-    const data = await file.arrayBuffer();
-    const wb = XLSX.read(data);
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
-
-    const newOD = {};
-    let count = 0;
-    let uploadDateKey = null;
-    for (let i = 6; i < rows.length; i++) {
-      const row = rows[i];
-      if (!row[0]) continue;
-      let dateStr = String(row[0]).trim();
-      // Handle Excel serial date numbers (e.g. 46023)
-      if (/^\d{5}$/.test(dateStr)) {
-        const epoch = new Date(1899, 11, 30);
-        epoch.setDate(epoch.getDate() + parseInt(dateStr));
-        const yy = epoch.getFullYear();
-        const mm = String(epoch.getMonth()+1).padStart(2,'0');
-        const dd = String(epoch.getDate()).padStart(2,'0');
-        dateStr = '' + yy + mm + dd;
-      }
-      // Handle YYYY/MM/DD or YYYY-MM-DD
-      if (/^202[6-9][\/-]\d{2}[\/-]\d{2}$/.test(dateStr)) {
-        dateStr = dateStr.replace(/[\/\-]/g, '');
-      }
-      if (!/^202[6-9]\d{4}$/.test(dateStr)) continue;
-      const y = dateStr.slice(0,4), m = dateStr.slice(4,6), d = dateStr.slice(6,8);
-      const key = y + "-" + m + "-" + d;
-      // Detect pull date: first row with * in column B
-      if (!uploadDateKey && row[1] && String(row[1]).trim() === '*') {
-        uploadDateKey = key;
-      }
-      const occ = parseFloat(row[3]);
-      const rev = parseFloat(row[8]);
-      if (!isNaN(occ) && !isNaN(rev)) {
-        newOD[key] = [occ, rev];
-        count++;
-      }
+window.showAdminPanel=function(){const pw=prompt("請輸入管理員密碼：");if(pw!==ADMIN_PW){if(pw!==null)alert("密碼錯誤！");return;}document.getElementById("admin-panel").style.display="block";};
+window.handleExcelUpload=async function(input){
+  const file=input.files[0];if(!file)return;
+  const statusEl=document.getElementById("upload-status");
+  statusEl.textContent="⏳ 讀取中...";statusEl.style.color="#6c757d";
+  try{
+    const data=await file.arrayBuffer();
+    const wb=window.XLSX.read(data);
+    const rows=window.XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});
+    const newOD={};let count=0,uploadDateKey=null;
+    for(let i=6;i<rows.length;i++){
+      const row=rows[i];if(!row[0])continue;
+      let dateStr=String(row[0]).trim();
+      if(/^\d{5}$/.test(dateStr)){const ep=new Date(1899,11,30);ep.setDate(ep.getDate()+parseInt(dateStr));dateStr=ep.getFullYear()+String(ep.getMonth()+1).padStart(2,'0')+String(ep.getDate()).padStart(2,'0');}
+      if(/^202[6-9][\/-]\d{2}[\/-]\d{2}$/.test(dateStr))dateStr=dateStr.replace(/[\/\-]/g,'');
+      if(!/^202[6-9]\d{4}$/.test(dateStr))continue;
+      const y=dateStr.slice(0,4),m=dateStr.slice(4,6),d=dateStr.slice(6,8),key=y+"-"+m+"-"+d;
+      if(!uploadDateKey&&row[1]&&String(row[1]).trim()==='*')uploadDateKey=key;
+      const occ=parseFloat(row[3]),rev=parseFloat(row[8]);
+      if(!isNaN(occ)&&!isNaN(rev)){newOD[key]=[occ,rev];count++;}
     }
-
-    if (count === 0) {
-      statusEl.textContent = "❌ 找不到資料，請確認 Excel 格式";
-      statusEl.style.color = "#e74c3c";
-      return;
-    }
-
-    statusEl.textContent = "✅ 讀取完成 " + count + " 筆，上傳中...";
-    statusEl.style.color = "#f39c12";
-    await window.uploadToFirestore(newOD);
-    Object.assign(window.OD, newOD);
+    if(count===0){statusEl.textContent="❌ 找不到資料";statusEl.style.color="#dc3545";return;}
+    statusEl.textContent="✅ 讀取 "+count+" 筆，上傳中...";statusEl.style.color="#fd7e14";
+    // Save WoW snapshot
+    try{const history=JSON.parse(localStorage.getItem('wow_history')||'[]');const months={};Object.keys(window.OD).forEach(k=>{const mk=k.slice(0,7);if(!months[mk])months[mk]={occSum:0,occCount:0,rev:0};const od=window.OD[k];if(od){months[mk].rev+=od[1];if(od[0]>0){months[mk].occSum+=od[0];months[mk].occCount++;}}});const monthSnap={};Object.entries(months).forEach(([mk,v])=>{monthSnap[mk]={occ:v.occCount>0?v.occSum/v.occCount:0,rev:v.rev};});history.push({ts:Date.now(),months:monthSnap});if(history.length>30)history.splice(0,history.length-30);localStorage.setItem('wow_history',JSON.stringify(history));}catch(e){}
+    await window.uploadToFirestore(newOD,uploadDateKey);
+    if(uploadDateKey){window.OCC_PULL_DATE=uploadDateKey;localStorage.setItem('occ_pull_date',uploadDateKey);localStorage.setItem('occ_upload_ts',new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}));}
+    Object.assign(window.OD,newOD);
     window.render();
-    console.log("✅ Uploaded", count, "entries. Sample keys:", Object.keys(newOD).slice(0,5));
-    // Save snapshot of CURRENT on-hand data before overwriting (for WoW comparison)
-    try {
-      const history = JSON.parse(localStorage.getItem('wow_history') || '[]');
-      // Build snapshot of all months currently in OD
-      const months = {};
-      Object.keys(window.OD).forEach(k => {
-        const mk = k.slice(0,7);
-        if (!months[mk]) months[mk] = { occSum: 0, occCount: 0, rev: 0 };
-        const od = window.OD[k];
-        if (od) { months[mk].rev += od[1]; if (od[0] > 0) { months[mk].occSum += od[0]; months[mk].occCount++; } }
-      });
-      const monthSnap = {};
-      Object.entries(months).forEach(([mk, v]) => {
-        monthSnap[mk] = { occ: v.occCount > 0 ? v.occSum/v.occCount : 0, rev: v.rev };
-      });
-      history.push({ ts: Date.now(), months: monthSnap });
-      // Keep only last 30 snapshots
-      if (history.length > 30) history.splice(0, history.length - 30);
-      localStorage.setItem('wow_history', JSON.stringify(history));
-    } catch(e) { console.warn('Snapshot save failed:', e); }
-    // Store pull date for calendar rendering (actual vs forecast distinction)
-    if (uploadDateKey) {
-      window.OCC_PULL_DATE = uploadDateKey;
-      localStorage.setItem('occ_pull_date', uploadDateKey);
-      localStorage.setItem('occ_upload_ts', new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'long',day:'numeric'}));
-    }
-    // Merge new data into window.OD and re-render calendar
-    Object.assign(window.OD, newOD);
-    window.render();
-    statusEl.textContent = "✅ 成功更新 " + count + " 筆資料！" + (uploadDateKey ? "　資料截至 " + uploadDateKey : "");
-    statusEl.style.color = "#27ae60";
-    input.value = "";
-  } catch(e) {
-    const msg = e.message || String(e);
-    if (msg.includes('permission') || msg.includes('PERMISSION')) {
-      statusEl.textContent = "❌ Firebase 權限錯誤：請先到 Firestore Console 更新 Rules";
-    } else if (msg.includes('network') || msg.includes('fetch')) {
-      statusEl.textContent = "❌ 網路錯誤：請確認網路連線";
-    } else {
-      statusEl.textContent = "❌ 錯誤：" + msg;
-    }
-    statusEl.style.color = "#e74c3c";
-    console.error("Upload error:", e);
-  }
+    statusEl.textContent="✅ 成功更新 "+count+" 筆！"+(uploadDateKey?" 截至 "+uploadDateKey:"");
+    statusEl.style.color="#20c997";input.value="";
+  }catch(e){statusEl.textContent="❌ 錯誤："+e.message;statusEl.style.color="#dc3545";}
 };
-
-// Init
 loadFirestoreOCC();
 </script>
-<!-- Admin panel -->
-<button onclick="showAdminPanel()" style="position:fixed;bottom:20px;right:20px;background:rgba(44,24,16,0.15);border:1px solid rgba(44,24,16,0.2);border-radius:20px;padding:8px 16px;font-size:12px;color:#5a4230;font-family:inherit;cursor:pointer;backdrop-filter:blur(4px);z-index:100">🔐 管理員</button>
-
-<div id="admin-panel" style="display:none;position:fixed;bottom:70px;right:20px;background:rgba(253,246,236,0.97);border:1px solid #c9b18a;border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(44,24,16,0.15);z-index:101;min-width:260px;backdrop-filter:blur(8px)">
+<button onclick="showAdminPanel()" style="position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:13px;font-family:inherit;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:100">🔐 管理員</button>
+<div id="admin-panel" style="display:none;position:fixed;bottom:70px;right:20px;background:#fff;border:1px solid #e9ecef;border-radius:14px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:101;min-width:280px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-    <span style="font-weight:700;color:#2c1810;font-size:14px;letter-spacing:1px">📊 更新住房率資料</span>
-    <button onclick="document.getElementById('admin-panel').style.display='none'" style="color:#8b6f47;font-size:18px;cursor:pointer;background:none;border:none;line-height:1">✕</button>
+    <span style="font-weight:700;font-size:14px">📊 更新住房率資料</span>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#6c757d">✕</button>
   </div>
-  <p style="font-size:12px;color:#8b6f47;margin-bottom:12px;line-height:1.6">上傳 Excel 後自動儲存至雲端，<br>所有人開網頁都會看到最新資料。</p>
-  <label style="display:block;background:#2c1810;color:#fdf6ec;text-align:center;padding:10px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:1px">
+  <p style="font-size:12px;color:#6c757d;margin-bottom:14px;line-height:1.6">上傳 Excel 後自動儲存至雲端，<br>所有人開網頁都會看到最新資料。</p>
+  <label style="display:block;background:#1a1a2e;color:#fff;text-align:center;padding:11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">
     📁 選擇 Excel 檔案
     <input type="file" accept=".xlsx,.xls" onchange="handleExcelUpload(this)" style="display:none">
   </label>
-  <div id="upload-status" style="margin-top:10px;font-size:12px;text-align:center;min-height:18px;color:#8b6f47"></div>
+  <div id="upload-status" style="margin-top:10px;font-size:12px;text-align:center;min-height:18px;color:#6c757d"></div>
 </div>
 
 </body>
