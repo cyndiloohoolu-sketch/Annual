@@ -223,6 +223,91 @@ function closeDayPopup(){const el=document.getElementById('day-popup');if(el)el.
 
 window.render=function render(){
 const{si,sd,f}=S,{y:yr,m:mo}=ML[si],dm=dim(yr,mo),f1=fdm(yr,mo);
+let h=`<div class="app-shell">`;
+// Header
+h+=`<div class="header"><div class="header-left"><h1>2026–2027 年曆</h1><p>2026 丙午馬年 → 2027 丁未羊年（雙春年）</p></div></div>`;
+// Filters
+h+=`<div class="filters">`;
+[{k:"holiday",l:"國定假日",c:"#dc3545",i:"🏮"},{k:"wedding",l:"宜嫁娶",c:"#d63384",i:"💍"},{k:"exhibition",l:"展覽",c:"#0d6efd",i:"🎨"},{k:"concert",l:"演唱會",c:"#6f42c1",i:"🎤"},{k:"occ",l:"住房率",c:"#20c997",i:"🏨"}].forEach(x=>{
+const on=f[x.k];h+=`<button class="fb ${on?"active":""}" onclick="tf('${x.k}')" style="${on?"background:"+x.c+";border-color:"+x.c:""}"><span>${x.i}</span><span class="fb-label">${x.l}</span></button>`;});
+h+=`</div>`;
+// Nav: year + months
+h+=`<div class="nav-bar"><div style="display:flex;gap:4px">`;
+[2026,2027].forEach(y=>{const a=yr===y;h+=`<button class="yb ${a?"active":""}" onclick="sY(${y})">${y}</button>`;});
+h+=`</div><div class="month-scroll">`;
+ML.filter(m=>m.y===yr).forEach(m=>{const gi=ML.indexOf(m),a=si===gi;h+=`<button class="mb ${a?"active":""}" onclick="sM(${gi})">${MN[m.m]}</button>`;});
+h+=`</div></div>`;
+// Calendar
+h+=`<div class="cal-wrap"><div class="cal-header"><button class="cal-nav-btn" onclick="sM(${si>0?si-1:si})">‹</button><span class="ct">${yr} ${MN[mo]}</span><button class="cal-nav-btn" onclick="sM(${si<ML.length-1?si+1:si})">›</button></div><div class="cg">`;
+W.forEach((w,i)=>{h+=`<div class="wh" style="${i===0||i===6?"color:var(--red)":""}">${w}</div>`;});
+h+=`</div><div class="cg">`;
+for(let i=0;i<f1;i++)h+=`<div style="border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface2)"></div>`;
+for(let d=1;d<=dm;d++){
+  const hol=H[dk(yr,mo,d)],wed=(WD[mk(yr,mo)]||[]).includes(d),dow=new Date(yr,mo,d).getDay(),we=dow===0||dow===6,sel=sd===d;
+  const sHol=f.holiday&&hol,sWed=f.wedding&&wed;
+  const od=window.OD[dk(yr,mo,d)],showOcc=f.occ&&od;
+  let extraClass=we?"weekend":"",bg="";
+  const isForecast=window.OCC_PULL_DATE&&dk(yr,mo,d)>=window.OCC_PULL_DATE;
+  if(showOcc&&od[0]>0)bg=isForecast?"":occColor(od[0]);
+  if(sHol)extraClass+=" holiday";
+  if(isForecast)extraClass+=" forecast";
+  if(sel)extraClass+=" selected";
+  // Event matching
+  function matchDay(p,mnth){const mn=mnth;const rM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);if(rM){const[,sm,sd2,em,ed]=rM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}const sM=p.match(/(\d+)\/(\d+)/g);if(sM)return sM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});return false;}
+  const mn=mo+1;
+  const dayEx=f.exhibition?(EX[mk(yr,mo)]||[]).filter(e=>matchDay(e.p||'',mn)):[];
+  const dayCo=f.concert?(CO[mk(yr,mo)]||[]).filter(e=>matchDay(e.p||'',mn)):[];
+  // Dots for mobile
+  let dotsHtml='<div class="dots-row">';
+  if(sHol)dotsHtml+=`<span class="dot" style="background:#dc3545"></span>`;
+  if(sWed)dotsHtml+=`<span class="dot" style="background:#d63384"></span>`;
+  dayEx.forEach(()=>{dotsHtml+=`<span class="dot" style="background:#0d6efd"></span>`;});
+  dayCo.forEach(()=>{dotsHtml+=`<span class="dot" style="background:#6f42c1"></span>`;});
+  dotsHtml+='</div>';
+  h+=`<button class="dc ${extraClass}" onclick="sD(${d})" style="${bg?"background:"+bg:""}"><span class="day-num">${d}</span>`;
+  if(showOcc)h+=`<span class="occ" style="color:${sel?"rgba(255,255,255,0.8)":od[0]>=80?"#dc3545":od[0]>=50?"#fd7e14":"#20c997"}">${od[0]}%</span>`;
+  if(sHol)h+=`<span class="ev hol">🏮${hol}</span>`;
+  if(sWed)h+=`<span class="ev wed">💍宜嫁娶</span>`;
+  dayEx.forEach(e=>{h+=`<span class="ev ex">🎨${e.n.replace(/（.*?）/g,'').replace(/台北國際/g,'').replace(/展覽會/g,'展').slice(0,8)}</span>`;});
+  dayCo.forEach(e=>{h+=`<span class="ev co">🎤${e.n.replace(/演唱會/g,'').replace(/巡迴/g,'').replace(/世界/g,'').slice(0,8)}</span>`;});
+  h+=dotsHtml+`</button>`;
+}
+h+=`</div></div>`;
+h+=renderWoW(yr,mo);
+h+=`</div><div class="ft"><p id="last-update-date">__LAST_UPDATE__</p><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
+const pullDate=window.OCC_PULL_DATE||localStorage.getItem('occ_pull_date');
+const uploadTs=localStorage.getItem('occ_upload_ts');
+let dateText='資料載入中...';
+if(pullDate){const[py,pm,pd]=pullDate.split('-');dateText='資料截至：'+py+'年'+parseInt(pm)+'月'+parseInt(pd)+'日'+(uploadTs?'　上傳：'+uploadTs:'');}
+h=h.replace('__LAST_UPDATE__',dateText);
+document.getElementById("app").innerHTML=h;}
+
+function showDayPopup(yr, mo, d) {
+  const W2=['日','一','二','三','四','五','六'];
+  const dow=new Date(yr,mo,d).getDay();
+  const dk2=yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  const mk2=yr+'-'+String(mo+1).padStart(2,'0');
+  const hol=H[dk2],wed=(WD[mk2]||[]).includes(d),od=window.OD[dk2];
+  function matchDay(p){const mn=mo+1;const rM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);if(rM){const[,sm,sd2,em,ed]=rM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}const sM=p.match(/(\d+)\/(\d+)/g);if(sM)return sM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});return false;}
+  const dayEx=(EX[mk2]||[]).filter(e=>matchDay(e.p||''));
+  const dayCo=(CO[mk2]||[]).filter(e=>matchDay(e.p||''));
+  let html='<div class="popup-overlay" onclick="if(event.target===this)closeDayPopup()"><div class="popup">';
+  html+='<div class="popup-header"><div><span class="popup-date">'+yr+' / '+(mo+1)+' / '+d+'</span><span class="popup-dow">週'+W2[dow]+'</span></div><button class="popup-close" onclick="closeDayPopup()">✕</button></div>';
+  html+='<div class="popup-body">';
+  let hasContent=false;
+  if(od&&S.f.occ){hasContent=true;const occ=od[0],rev=od[1];const oc=occ>=80?'#dc3545':occ>=50?'#fd7e14':'#20c997';html+='<div class="popup-section"><div class="popup-section-title">住房率</div><div class="popup-occ-row"><div class="popup-occ-card"><div class="popup-occ-label">OCC</div><div class="popup-occ-val" style="color:'+oc+'">'+occ+'%</div></div><div class="popup-occ-card"><div class="popup-occ-label">總房租</div><div class="popup-occ-val" style="font-size:15px">$'+rev.toLocaleString()+'</div></div></div></div>';}
+  if((hol&&S.f.holiday)||(wed&&S.f.wedding)){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">特殊日期</div>';if(hol&&S.f.holiday)html+='<div class="popup-row"><span class="popup-row-icon">🏮</span><div class="popup-row-content"><div class="popup-row-name" style="color:#dc3545">'+hol+'</div></div></div>';if(wed&&S.f.wedding)html+='<div class="popup-row"><span class="popup-row-icon">💍</span><div class="popup-row-content"><div class="popup-row-name" style="color:#d63384">宜嫁娶吉日</div></div></div>';html+='</div>';}
+  if(dayEx.length>0&&S.f.exhibition){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">展覽</div>';dayEx.forEach(e=>{html+='<div class="popup-row"><span class="popup-row-icon">🎨</span><div class="popup-row-content"><div class="popup-row-name">'+e.n+'</div><div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div></div></div>';});html+='</div>';}
+  if(dayCo.length>0&&S.f.concert){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">演唱會</div>';dayCo.forEach(e=>{html+='<div class="popup-row"><span class="popup-row-icon">🎤</span><div class="popup-row-content"><div class="popup-row-name">'+e.n+'</div><div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div></div></div>';});html+='</div>';}
+  if(!hasContent)html+='<div class="popup-empty">無特殊事項</div>';
+  html+='</div></div></div>';
+  const old=document.getElementById('day-popup');if(old)old.remove();
+  const el=document.createElement('div');el.id='day-popup';el.innerHTML=html;document.body.appendChild(el);
+}
+function closeDayPopup(){const el=document.getElementById('day-popup');if(el)el.remove();S.sd=null;}
+
+window.render=function render(){
+const{si,sd,f}=S,{y:yr,m:mo}=ML[si],dm=dim(yr,mo),f1=fdm(yr,mo);
 const mEx=EX[mk(yr,mo)]||[],mCo=CO[mk(yr,mo)]||[];
 const sH=sd?H[dk(yr,mo,sd)]:null,sW=sd&&(WD[mk(yr,mo)]||[]).includes(sd);
 const sOD=sd?OD[dk(yr,mo,sd)]:null;
