@@ -131,9 +131,9 @@ const W=["日","一","二","三","四","五","六"],MN=["一月","二月","三�
 for(let m=4;m<12;m++)ML.push({y:2026,m});for(let m=0;m<12;m++)ML.push({y:2027,m});
 const p=n=>n<10?"0"+n:""+n,mk=(y,m)=>y+"-"+p(m+1),dk=(y,m,d)=>y+"-"+p(m+1)+"-"+p(d),dim=(y,m)=>new Date(y,m+1,0).getDate(),fdm=(y,m)=>new Date(y,m,1).getDay();
 const H={"2026-05-01":"勞動節","2026-05-02":"勞動節補假","2026-06-19":"端午節","2026-06-20":"端午節補假","2026-06-21":"端午節彈性放假","2026-09-25":"中秋節","2026-09-26":"中秋節補假","2026-09-27":"中秋節彈性放假","2026-09-28":"教師節","2026-10-09":"國慶補假","2026-10-10":"國慶日","2026-10-11":"國慶彈性放假","2026-10-24":"光復節補假","2026-10-25":"台灣光復節","2026-10-26":"光復節彈性放假","2026-12-25":"行憲紀念日","2026-12-26":"行憲紀念日補假","2026-12-27":"行憲彈性放假","2027-01-01":"元旦","2027-01-02":"元旦補假","2027-02-05":"小年夜","2027-02-06":"除夕","2027-02-07":"春節初一","2027-02-08":"春節初二","2027-02-09":"春節初三","2027-02-10":"春節補假","2027-02-28":"和平紀念日","2027-03-01":"228補假","2027-04-04":"兒童節","2027-04-05":"清明節","2027-04-06":"清明補假","2027-05-01":"勞動節","2027-06-09":"端午節","2027-09-15":"中秋節","2027-09-28":"教師節","2027-10-10":"國慶日","2027-10-11":"國慶補假","2027-10-25":"台灣光復節","2027-12-25":"行憲紀念日"};
-const EX={"2026-05":[{n:"ATLife 臺灣輔具暨長照展",v:"南港展覽館1館",p:"5/14~5/17"},{n:"台北當代藝術博覽會",v:"南港展覽館",p:"5月中"}],"2026-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館+世貿",p:"6/2~6/5"},{n:"台北國際食品展",v:"南港展覽館+世貿1館",p:"6/24~6/27"}],"2026-07":[{n:"展昭寵物用品展",v:"南港展覽館1館",p:"7/3~7/6"},{n:"台灣生技展",v:"南港展覽館1館",p:"7/16~7/19"},{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],"2026-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會",v:"世貿一館",p:"8/14~8/17"},{n:"台北國際自動化展",v:"南港展覽館1&2館",p:"8/19~8/22"}],"2026-09":[{n:"SEMICON Taiwan 國際半導體展",v:"南港展覽館1&2館",p:"9/2~9/4"}],"2026-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2026-11":[{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"},{n:"北美館特展（預估）",v:"臺北市立美術館",p:"10月底起"}],"2026-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}],"2027-01":[{n:"台北國際書展（預估）",v:"南港展覽館1館",p:"1月底~2月初"},{n:"故宮常設展",v:"國立故宮博物院",p:"常設展"}],"2027-02":[{n:"台北國際動漫節（預估）",v:"南港展覽館1館",p:"2月上旬"},{n:"台北燈節",v:"台北市區",p:"2月中"}],"2027-03":[{n:"TIMTOS 台北國際工具機展",v:"南港展覽館1&2館",p:"3/2~3/7"},{n:"TAIPEI CYCLE 自行車展（預估）",v:"南港展覽館1&2館",p:"3月下旬"}],"2027-04":[{n:"台北國際汽機車零配件展（預估）",v:"南港展覽館1館",p:"4月中"},{n:"Touch Taiwan 智慧顯示展",v:"南港展覽館1館",p:"4/21~4/23"}],"2027-05":[{n:"台北當代藝術博覽會（預估）",v:"南港展覽館",p:"5月中"},{n:"ATLife 輔具暨長照展（預估）",v:"南港展覽館1館",p:"5月中"}],"2027-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館",p:"6/1~6/4"}],"2027-07":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"}],"2027-08":[{n:"漫畫博覽會（預估）",v:"南港展覽館1館",p:"7月底~8月初"},{n:"台灣藝術博覽會（預估）",v:"世貿一館",p:"8月中"},{n:"台北新藝術博覽會（預估）",v:"松山文創園區",p:"8月下旬"}],"2027-09":[{n:"SEMICON Taiwan（預估）",v:"南港展覽館1&2館",p:"9月上旬"},{n:"台北國際自動化展（預估）",v:"南港展覽館1&2館",p:"9月"}],"2027-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2027-11":[{n:"第15屆台北雙年展（預估）",v:"臺北市立美術館",p:"11月起"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"}],"2027-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}]};
+const EX={"2026-05":[{n:"ATLife 臺灣輔具暨長照展",v:"南港展覽館1館",p:"5/14~5/17"},{n:"台北當代藝術博覽會",v:"南港展覽館",p:"5月中"}],"2026-06":[{n:"COMPUTEX 台北國際電腦展",v:"南港展覽館1&2館+世貿",p:"6/2~6/5"},{n:"台北國際食品展",v:"南港展覽館+世貿1館",p:"6/24~6/27"}],"2026-07":[{n:"展昭寵物用品展",v:"南港展覽館1館",p:"7/3~7/6"},{n:"台灣生技展",v:"南港展覽館1館",p:"7/16~7/19"},{n:"漫畫博覽會",v:"世貿一館",p:"7/23~7/27"}],"2026-08":[{n:"台灣藝術博覽會",v:"世貿一館",p:"8/14~8/17"},{n:"台北國際自動化工業大展",v:"南港展覽館1&2館",p:"8/19~8/22"},{n:"潮台北 Trendy Taipei 音樂節",v:"小巨蛋＋北流等",p:"8/22~9/6"}],"2026-09":[{n:"SEMICON Taiwan 國際半導體展",v:"南港展覽館1&2館",p:"9/2~9/4"},{n:"潮台北 Trendy Taipei 音樂節",v:"小巨蛋＋北流等",p:"8/22~9/6"}],"2026-10":[{n:"台灣世界連鎖加盟大展",v:"南港展覽館",p:"10/2~10/5"},{n:"ART TAIPEI 台北國際藝術博覽會",v:"世貿一館",p:"10/30~11/2"}],"2026-11":[{n:"ART TAIPEI 台北國際藝術博覽會",v:"世貿一館",p:"10/30~11/2"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"},{n:"臺北白晝之夜 Nuit Blanche（預估）",v:"台北市區",p:"11/7"}],"2026-12":[{n:"臺北馬拉松（預估）",v:"台北市區",p:"12/20"},{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}],"2027-01":[{n:"台北國際書展（預估）",v:"南港展覽館1館",p:"1月底~2月初"},{n:"故宮常設展",v:"國立故宮博物院",p:"常設展"}],"2027-02":[{n:"台北國際動漫節（預估）",v:"南港展覽館1館",p:"2月上旬"},{n:"台北燈節",v:"台北市區",p:"2月中"}],"2027-03":[{n:"TIMTOS 台北國際工具機展",v:"南港展覽館1&2館",p:"3/2~3/7"},{n:"TAIPEI CYCLE 自行車展（預估）",v:"南港展覽館1&2館",p:"3月下旬"}],"2027-04":[{n:"台北國際汽機車零配件展（預估）",v:"南港展覽館1館",p:"4月中"}],"2027-05":[{n:"台北當代藝術博覽會（預估）",v:"南港展覽館",p:"5月中"},{n:"ATLife 輔具暨長照展（預估）",v:"南港展覽館1館",p:"5月中"}],"2027-06":[{n:"COMPUTEX 台北國際電腦展（預估）",v:"南港展覽館1&2館",p:"6月上旬"}],"2027-07":[{n:"漫畫博覽會（預估）",v:"世貿一館",p:"7月下旬"}],"2027-08":[{n:"台灣藝術博覽會（預估）",v:"世貿一館",p:"8月中"},{n:"台北新藝術博覽會（預估）",v:"松山文創園區",p:"8月下旬"}],"2027-09":[{n:"SEMICON Taiwan（預估）",v:"南港展覽館1&2館",p:"9月上旬"},{n:"台北國際自動化展（預估）",v:"南港展覽館1&2館",p:"9月"}],"2027-10":[{n:"ART TAIPEI（預估）",v:"世貿一館",p:"10月下旬"}],"2027-11":[{n:"第15屆台北雙年展（預估）",v:"臺北市立美術館",p:"11月起"},{n:"台北國際旅展 ITF（預估）",v:"南港展覽館1&2館",p:"11月上旬"}],"2027-12":[{n:"台北國際電玩展（預估）",v:"南港展覽館1館",p:"12月底~1月初"}]};
 const WD={"2026-05":[1,4,6,7,10,11,13,16,18,20,21,24,25,27,30],"2026-06":[1,2,5,6,8,11,13,14,15,16,19,20,22,25,27,28],"2026-07":[1,2,4,7,9,10,13,15,16,18,21,23,24,27,28,30],"2026-08":[2,3,5,8,10,11,14,15,17,20,22,24,26,27,29],"2026-09":[1,2,5,7,8,11,13,14,17,19,20,23,25,26,29],"2026-10":[1,3,6,8,10,11,14,17,19,20,23,25,26,29,31],"2026-11":[1,2,5,7,8,11,13,14,17,19,20,22,25,26,29],"2026-12":[1,2,4,7,8,10,13,14,16,19,20,22,25,26,28,31],"2027-01":[2,5,6,15,17,23,24,31],"2027-02":[6,9,14,17,20,21,26],"2027-03":[4,5,6,8,10,11,13,16,17,18,23,28,29],"2027-04":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],"2027-05":[3,6,7,9,13,15,17,19,21,24,25,27,28,31],"2027-06":[5,9,10,11,12,18,19,21,24,27],"2027-07":[3,5,7,9,11,15,17,19,21,23,27,29,31],"2027-08":[2,5,8,10,14,17,20,22,26,29],"2027-09":[1,3,7,9,12,15,19,21,24,27],"2027-10":[1,3,6,9,12,15,18,21,24,27,30],"2027-11":[2,5,8,12,14,17,20,23,26,29],"2027-12":[3,5,8,12,16,19,22,27,28]};
-const CO={"2026-04":[{n:"鄧紫棋《I AM GLORIA》2.0演唱會",v:"台北大巨蛋",p:"4/9~4/12"},{n:"ONE OK ROCK《DETOX》演唱會",v:"台北大巨蛋",p:"4/25~4/26"},{n:"周蕙「好想好好愛」演唱會",v:"台北小巨蛋",p:"4/25"}],"2026-05":[{n:"動力火車《都是因為愛》安可場",v:"台北小巨蛋",p:"5/3~5/5"},{n:"EXO PLANET #6《EXhOrizon》演唱會",v:"台北小巨蛋",p:"5/9~5/10"},{n:"動力火車《一路向前》世界巡迴",v:"台北小巨蛋",p:"5/15~5/17"},{n:"孫燕姿「日落以後」演唱會",v:"台北大巨蛋",p:"5/15、5/17"},{n:"韋禮安《HI WE1 韋，您好》演唱會",v:"台北小巨蛋",p:"5/30~5/31"}],"2026-06":[{n:"King Gnu《CEN+RAL Tour 2026》",v:"台北小巨蛋",p:"6/6~6/7"},{n:"國際扶輪年會（5萬人大型會議）",v:"台北大巨蛋＋南港展覽館1&2館",p:"6/13~6/17"},{n:"LiSA《LiVE is Smile Always ～15～》",v:"台北小巨蛋",p:"6/19~6/20"}],"2026-07":[{n:"五月天《#5525+2回到那一天》",v:"台北大巨蛋",p:"7/3~7/5、7/8、7/10~7/12"},{n:"滅火器《ON FIRE DAY》演唱會",v:"台北小巨蛋",p:"7/18~7/19"}],"2026-08":[{n:"aespa《2026-27 LIVE TOUR SYNK》",v:"台北大巨蛋",p:"8/11"}],"2026-09":[{n:"IVE《SHOW WHAT I AM》世界巡迴",v:"台北小巨蛋",p:"9/11~9/13"},{n:"LANY《soft world tour》",v:"台北小巨蛋",p:"9/26"}],"2026-10":[{n:"BIGBANG《20/26 WORLD TOUR》",v:"台北大巨蛋",p:"10/10~10/11"}],"2026-11":[{n:"YOASOBI 亞洲巨蛋巡演（日期待公布）",v:"台北大巨蛋",p:"TBD"}],"2026-12":[{n:"台北市跨年晚會（卡司待公布）",v:"台北市府廣場",p:"12/31"},{n:"台北101跨年煙火",v:"台北101",p:"12/31"}]};
+const CO={"2026-04":[{n:"鄧紫棋《I AM GLORIA》2.0演唱會",v:"台北大巨蛋",p:"4/9~4/12"},{n:"ONE OK ROCK《DETOX》演唱會",v:"台北大巨蛋",p:"4/25~4/26"},{n:"周蕙「好想好好愛」演唱會",v:"台北小巨蛋",p:"4/25"}],"2026-05":[{n:"動力火車《都是因為愛》安可場",v:"台北小巨蛋",p:"5/3~5/5"},{n:"EXO PLANET #6《EXhOrizon》演唱會",v:"台北小巨蛋",p:"5/9~5/10"},{n:"動力火車《一路向前》世界巡迴",v:"台北小巨蛋",p:"5/15~5/17"},{n:"孫燕姿「日落以後」演唱會",v:"台北大巨蛋",p:"5/15、5/17"},{n:"韋禮安《HI WE1 韋，您好》演唱會",v:"台北小巨蛋",p:"5/30~5/31"}],"2026-06":[{n:"King Gnu《CEN+RAL Tour 2026》",v:"台北小巨蛋",p:"6/6~6/7"},{n:"國際扶輪年會（5萬人大型會議）",v:"台北大巨蛋＋南港展覽館1&2館",p:"6/13~6/17"},{n:"LiSA《LiVE is Smile Always ～15～》",v:"台北小巨蛋",p:"6/19~6/20"}],"2026-07":[{n:"五月天《#5525+2回到那一天》",v:"台北大巨蛋",p:"7/3~7/5、7/8、7/10~7/12"},{n:"滅火器《ON FIRE DAY》演唱會",v:"台北小巨蛋",p:"7/18~7/19"}],"2026-08":[{n:"aespa《2026-27 LIVE TOUR SYNK》",v:"台北大巨蛋",p:"8/11"},{n:"八三夭「沒有翅膀的人」演唱會",v:"台北小巨蛋",p:"8/15~8/16"},{n:"Official髭男dism 演唱會",v:"台北小巨蛋",p:"8/29~8/30"}],"2026-09":[{n:"ITZY《TUNNEL VISION》世界巡迴",v:"台北小巨蛋",p:"9/5"},{n:"IVE《SHOW WHAT I AM》世界巡迴",v:"台北小巨蛋",p:"9/11~9/13"},{n:"LANY《soft world tour》",v:"台北小巨蛋",p:"9/26"}],"2026-10":[{n:"BIGBANG《20/26 WORLD TOUR》",v:"台北大巨蛋",p:"10/10~10/11"}],"2026-11":[{n:"YOASOBI 亞洲巨蛋巡演（日期待公布）",v:"台北大巨蛋",p:"TBD"}],"2026-12":[{n:"台北市跨年晚會（卡司待公布）",v:"台北市府廣場",p:"12/31"},{n:"台北101跨年煙火",v:"台北101",p:"12/31"}]};
 const CTBD=[];
 
 const BUDGET={"2026-04":[78.1,10528515],"2026-05":[79.01,11360291],"2026-06":[80.71,11368055],"2026-07":[72.02,8982167],"2026-08":[68.33,8751734],"2026-09":[73.05,9827650],"2026-10":[76.99,10627811],"2026-11":[86.44,11733561],"2026-12":[82.52,10496700]};
@@ -203,7 +203,25 @@ function showDayPopup(yr, mo, d) {
   const dk2=yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
   const mk2=yr+'-'+String(mo+1).padStart(2,'0');
   const hol=H[dk2],wed=(WD[mk2]||[]).includes(d),od=window.OD[dk2];
-  function matchDay(p){const mn=mo+1;const rM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);if(rM){const[,sm,sd2,em,ed]=rM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}const sM=p.match(/(\d+)\/(\d+)/g);if(sM)return sM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});return false;}
+  function matchDay(p){
+    const mn=mo+1;
+    // Split by 、/, into segments, each segment can be a range (a/b~c/d) or single date (a/b)
+    const segments=p.split(/[、,，]/);
+    return segments.some(seg=>{
+      seg=seg.trim();
+      const rM=seg.match(/(\d+)\/(\d+)\s*[~～到-]\s*(\d+)\/(\d+)/);
+      if(rM){
+        const[,sm,sd2,em,ed]=rM.map(Number);
+        return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));
+      }
+      const sM=seg.match(/(\d+)\/(\d+)/);
+      if(sM){
+        const m2=Number(sM[1]),d2=Number(sM[2]);
+        return m2===mn&&d2===d;
+      }
+      return false;
+    });
+  }
   const dayEx=(EX[mk2]||[]).filter(e=>matchDay(e.p||''));
   const dayCo=(CO[mk2]||[]).filter(e=>matchDay(e.p||''));
   let html='<div class="popup-overlay" onclick="if(event.target===this)closeDayPopup()"><div class="popup">';
@@ -248,7 +266,24 @@ for(let d=1;d<=dm;d++){
   if(sHol)extraClass+=" holiday";
   if(isForecast)extraClass+=" forecast";
   if(sel)extraClass+=" selected";
-  function matchDay(p,mnth){const mn=mnth;const rM=p.match(/(\d+)\/(\d+)[~～到-](\d+)\/(\d+)/);if(rM){const[,sm,sd2,em,ed]=rM.map(Number);return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));}const sM=p.match(/(\d+)\/(\d+)/g);if(sM)return sM.some(s=>{const[m2,d2]=s.split('/').map(Number);return m2===mn&&d2===d;});return false;}
+  function matchDay(p,mnth){
+    const mn=mnth;
+    const segments=p.split(/[、,，]/);
+    return segments.some(seg=>{
+      seg=seg.trim();
+      const rM=seg.match(/(\d+)\/(\d+)\s*[~～到-]\s*(\d+)\/(\d+)/);
+      if(rM){
+        const[,sm,sd2,em,ed]=rM.map(Number);
+        return(mn>sm||(mn===sm&&d>=sd2))&&(mn<em||(mn===em&&d<=ed));
+      }
+      const sM=seg.match(/(\d+)\/(\d+)/);
+      if(sM){
+        const m2=Number(sM[1]),d2=Number(sM[2]);
+        return m2===mn&&d2===d;
+      }
+      return false;
+    });
+  }
   const mn=mo+1;
   const dayEx=f.exhibition?(EX[mk(yr,mo)]||[]).filter(e=>matchDay(e.p||'',mn)):[];
   const dayCo=f.concert?(CO[mk(yr,mo)]||[]).filter(e=>matchDay(e.p||'',mn)):[];
@@ -294,7 +329,18 @@ async function loadFirestoreOCC(){
     const snap=await getDocs(collection(db,"occ_data"));
     if(!snap.empty){
       let total=0;
-      snap.forEach(ds=>{Object.entries(ds.data()).forEach(([k,v])=>{let key=k;if(/^\d{8}$/.test(k))key=k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);window.OD[key]=v;total++;});});
+      const oldChunkDocs=[];
+      snap.forEach(ds=>{
+        // Detect old chunk-style docs (occ_0, occ_1, occ_2...)
+        if(/^occ_\d+$/.test(ds.id))oldChunkDocs.push(ds);
+        Object.entries(ds.data()).forEach(([k,v])=>{
+          let key=k;
+          if(/^\d{8}$/.test(k))key=k.slice(0,4)+'-'+k.slice(4,6)+'-'+k.slice(6,8);
+          if(/^\d{4}-\d{2}-\d{2}$/.test(key)){window.OD[key]=v;total++;}
+        });
+      });
+      // Migrate: if there are old chunk docs but no month docs yet, that's OK - data still loads
+      // Old chunk docs will be replaced when user next uploads Excel
       try{const ms=await getDoc(doc(db,"meta","info"));if(ms.exists()){const m=ms.data();if(m.pullDate){window.OCC_PULL_DATE=m.pullDate;localStorage.setItem('occ_pull_date',m.pullDate);}if(m.lastUpdated){const d=new Date(m.lastUpdated);localStorage.setItem('occ_upload_ts',d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日');}}}catch(e){}
       console.log("✅ Firestore loaded:",total,"entries");
       window.render();
@@ -302,8 +348,17 @@ async function loadFirestoreOCC(){
   }catch(e){console.warn("Firestore load failed:",e);}
 }
 window.uploadToFirestore=async function(occData,uploadDateKey){
-  const entries=Object.entries(occData);
-  for(let i=0;i<entries.length;i+=100){await setDoc(doc(db,"occ_data","occ_"+Math.floor(i/100)),Object.fromEntries(entries.slice(i,i+100)));}
+  // Group by month key (e.g. "2026-07") so each upload only overwrites that month
+  const byMonth={};
+  Object.entries(occData).forEach(([k,v])=>{
+    const mk=k.slice(0,7); // "2026-07"
+    if(!byMonth[mk])byMonth[mk]={};
+    byMonth[mk][k]=v;
+  });
+  // Write each month as its own doc - won't overwrite other months
+  for(const[mk,data] of Object.entries(byMonth)){
+    await setDoc(doc(db,"occ_data","month_"+mk),data);
+  }
   await setDoc(doc(db,"meta","info"),{lastUpdated:new Date().toISOString(),uploadedBy:"admin",pullDate:uploadDateKey||null});
 };
 window.showAdminPanel=function(){const pw=prompt("請輸入管理員密碼：");if(pw!==ADMIN_PW){if(pw!==null)alert("密碼錯誤！");return;}document.getElementById("admin-panel").style.display="block";};
