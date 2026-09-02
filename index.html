@@ -119,6 +119,22 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .wow-flat{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
 .wow-bar-label{font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
 
+
+.dod-panel{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-md);padding:18px 20px;margin-bottom:14px}
+.dod-title{font-size:13px;font-weight:700;color:var(--text-primary);letter-spacing:0.3px;margin-bottom:4px}
+.dod-sub{font-size:10px;color:var(--text-muted);margin-bottom:12px}
+.dod-table{width:100%;border-collapse:collapse;font-size:12px}
+.dod-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);padding:4px 8px;text-align:right;border-bottom:2px solid var(--border)}
+.dod-table th:first-child{text-align:left}
+.dod-table td{padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text-secondary)}
+.dod-table td:first-child{text-align:left;color:var(--text-primary);font-weight:600}
+.dod-table tr:last-child td{border-bottom:none}
+.dod-table tr:hover td{background:var(--surface2)}
+.dod-up{color:#20c997;font-weight:700}
+.dod-down{color:#dc3545;font-weight:700}
+.dod-flat{color:var(--text-muted)}
+.dod-today{background:rgba(26,26,46,0.04)}
+
 .ft{text-align:center;font-size:11px;color:var(--text-muted);line-height:1.8;padding:16px 16px 32px;border-top:1px solid var(--border);margin-top:4px}
 .ft p{margin:2px 0}
 </style>
@@ -148,6 +164,94 @@ let S={si:0,sd:null,f:{holiday:true,wedding:true,exhibition:true,concert:true,oc
 
 function fmtRev(n){if(n>=1000000)return(n/1000000).toFixed(1)+"M";if(n>=10000)return Math.round(n/1000)+"K";return n.toLocaleString();}
 function occColor(o){if(o>=80)return"rgba(231,76,60,0.25)";if(o>=50)return"rgba(241,196,15,0.12)";if(o>=20)return"rgba(39,174,96,0.12)";if(o>0)return"rgba(39,174,96,0.08)";return"transparent";}
+
+
+function renderDOD(yr, mo) {
+  if (!S.f.occ) return '';
+  const MN2 = ["一","二","三","四","五","六","七","八","九","十","十一","十二"];
+  const W2 = ["日","一","二","三","四","五","六"];
+  const daysInMonth = new Date(yr, mo+1, 0).getDate();
+  const mk2 = yr+'-'+String(mo+1).padStart(2,'0');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const pullD = window.OCC_PULL_DATE ? new Date(window.OCC_PULL_DATE) : today;
+
+  // Build rows
+  let rows = '';
+  let hasData = false;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = mk2+'-'+String(d).padStart(2,'0');
+    const od = window.OD[ds];
+    if (!od) continue;
+
+    // Previous day (could be last month)
+    let prevDs;
+    if (d === 1) {
+      const prevMo = mo === 0 ? 11 : mo-1;
+      const prevYr = mo === 0 ? yr-1 : yr;
+      const prevDim = new Date(prevYr, prevMo+1, 0).getDate();
+      prevDs = prevYr+'-'+String(prevMo+1).padStart(2,'0')+'-'+String(prevDim).padStart(2,'0');
+    } else {
+      prevDs = mk2+'-'+String(d-1).padStart(2,'0');
+    }
+    const prevOd = window.OD[prevDs];
+
+    const occ = od[0], adr = od[2]||0;
+    const prevOcc = prevOd ? prevOd[0] : null;
+    const prevAdr = prevOd ? (prevOd[2]||0) : null;
+
+    const occDiff = prevOcc !== null ? occ - prevOcc : null;
+    const adrDiff = prevAdr !== null ? adr - prevAdr : null;
+
+    function diffTag(diff, isAdr) {
+      if (diff === null) return '<span class="dod-flat">—</span>';
+      const cls = diff > (isAdr ? 100 : 0.5) ? 'dod-up' : diff < (isAdr ? -100 : -0.5) ? 'dod-down' : 'dod-flat';
+      const arrow = diff > (isAdr ? 100 : 0.5) ? '▲' : diff < (isAdr ? -100 : -0.5) ? '▼' : '—';
+      const sign = diff > 0 ? '+' : '';
+      const val = isAdr ? sign+Math.round(diff).toLocaleString() : sign+diff.toFixed(1)+'%';
+      return '<span class="'+cls+'">'+arrow+' '+val+'</span>';
+    }
+
+    const dt = new Date(yr, mo, d);
+    const isToday = dt.getTime() === today.getTime();
+    const isForecast = dt >= pullD;
+    const dow = dt.getDay();
+    const isWe = dow === 0 || dow === 6;
+
+    const dateLabel = d+'日（'+W2[dow]+'）';
+    const occLabel = occ > 0 ? occ+'%' : '—';
+    const adrLabel = adr > 0 ? '$'+adr.toLocaleString() : '—';
+    const trClass = isToday ? 'dod-today' : '';
+    const dateStyle = isWe ? 'color:var(--red)' : isForecast ? 'color:var(--text-muted);font-style:italic' : '';
+
+    rows += '<tr class="'+trClass+'">'+
+      '<td style="'+dateStyle+'">'+dateLabel+(isForecast ? ' ·' : '')+'</td>'+
+      '<td>'+occLabel+'</td>'+
+      '<td>'+diffTag(occDiff, false)+'</td>'+
+      '<td>'+adrLabel+'</td>'+
+      '<td>'+diffTag(adrDiff, true)+'</td>'+
+    '</tr>';
+    hasData = true;
+  }
+
+  if (!hasData) return '';
+
+  return '<div class="dod-panel">'+
+    '<div class="dod-title">📅 '+MN2[mo]+'月 每日 DOD</div>'+
+    '<div class="dod-sub">每日 vs 前一日變化｜斜體 = 預測值</div>'+
+    '<div style="overflow-x:auto">'+
+    '<table class="dod-table">'+
+      '<thead><tr>'+
+        '<th>日期</th>'+
+        '<th>OCC</th>'+
+        '<th>OCC DOD</th>'+
+        '<th>ADR</th>'+
+        '<th>ADR DOD</th>'+
+      '</tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table></div>'+
+  '</div>';
+}
 
 function renderWoW(yr, mo) {
   if (!S.f.occ) return '';
@@ -228,7 +332,10 @@ function showDayPopup(yr, mo, d) {
   html+='<div class="popup-header"><div><span class="popup-date">'+yr+' / '+(mo+1)+' / '+d+'</span><span class="popup-dow">週'+W2[dow]+'</span></div><button class="popup-close" onclick="closeDayPopup()">✕</button></div>';
   html+='<div class="popup-body">';
   let hasContent=false;
-  if(od&&S.f.occ){hasContent=true;const occ=od[0],rev=od[1];const oc=occ>=80?'#dc3545':occ>=50?'#fd7e14':'#20c997';html+='<div class="popup-section"><div class="popup-section-title">住房率</div><div class="popup-occ-row"><div class="popup-occ-card"><div class="popup-occ-label">OCC</div><div class="popup-occ-val" style="color:'+oc+'">'+occ+'%</div></div><div class="popup-occ-card"><div class="popup-occ-label">總房租</div><div class="popup-occ-val" style="font-size:15px">$'+rev.toLocaleString()+'</div></div></div></div>';}
+  if(od&&S.f.occ){hasContent=true;const occ=od[0],rev=od[1];const oc=occ>=80?'#dc3545':occ>=50?'#fd7e14':'#20c997';html+='<div class="popup-section"><div class="popup-section-title">住房率</div><div class="popup-occ-row"><div class="popup-occ-card"><div class="popup-occ-label">OCC</div><div class="popup-occ-val" style="color:'+oc+'">'+occ+'%</div></div><div class="popup-occ-card"><div class="popup-occ-label">總房租</div><div class="popup-occ-val" style="font-size:15px">$'+rev.toLocaleString()+'</div></div></div>';
+    const adr=od[2];
+    if(adr&&adr>0){html+='<div class="popup-occ-row" style="margin-top:8px"><div class="popup-occ-card"><div class="popup-occ-label">ADR（售房均價）</div><div class="popup-occ-val" style="font-size:18px">$'+adr.toLocaleString()+'</div></div></div>';}
+    html+='</div>';}
   if((hol&&S.f.holiday)||(wed&&S.f.wedding)){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">特殊日期</div>';if(hol&&S.f.holiday)html+='<div class="popup-row"><span class="popup-row-icon">🏮</span><div class="popup-row-content"><div class="popup-row-name" style="color:#dc3545">'+hol+'</div></div></div>';if(wed&&S.f.wedding)html+='<div class="popup-row"><span class="popup-row-icon">💍</span><div class="popup-row-content"><div class="popup-row-name" style="color:#d63384">宜嫁娶吉日</div></div></div>';html+='</div>';}
   if(dayEx.length>0&&S.f.exhibition){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">展覽</div>';dayEx.forEach(e=>{html+='<div class="popup-row"><span class="popup-row-icon">🎨</span><div class="popup-row-content"><div class="popup-row-name">'+e.n+'</div><div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div></div></div>';});html+='</div>';}
   if(dayCo.length>0&&S.f.concert){hasContent=true;html+='<div class="popup-section"><div class="popup-section-title">演唱會</div>';dayCo.forEach(e=>{html+='<div class="popup-row"><span class="popup-row-icon">🎤</span><div class="popup-row-content"><div class="popup-row-name">'+e.n+'</div><div class="popup-row-meta">📍 '+e.v+'　📅 '+e.p+'</div></div></div>';});html+='</div>';}
@@ -303,6 +410,7 @@ for(let d=1;d<=dm;d++){
 }
 h+=`</div></div>`;
 h+=renderWoW(yr,mo);
+h+=renderDOD(yr,mo);
 h+=`</div><div class="ft"><p id="last-update-date">__LAST_UPDATE__</p><p>⚠️ 2026年行事曆依行政院人事行政總處公布；2027年為預估版本</p><p>結婚吉日依農曆黃曆「宜嫁娶」標註，擇日建議參考專業命理師</p><p>展覽與演唱會含預估項目，實際依各主辦單位公告為準</p><p>住房率資料僅供參考（2026年，含預測值）</p></div>`;
 const pullDate=window.OCC_PULL_DATE||localStorage.getItem('occ_pull_date');
 const uploadTs=localStorage.getItem('occ_upload_ts');
@@ -379,8 +487,8 @@ window.handleExcelUpload=async function(input){
       if(!/^202[6-9]\d{4}$/.test(dateStr))continue;
       const y=dateStr.slice(0,4),m=dateStr.slice(4,6),d=dateStr.slice(6,8),key=y+"-"+m+"-"+d;
       if(!uploadDateKey&&row[1]&&String(row[1]).trim()==='*')uploadDateKey=key;
-      const occ=parseFloat(row[3]),rev=parseFloat(row[8]);
-      if(!isNaN(occ)&&!isNaN(rev)){newOD[key]=[occ,rev];count++;}
+      const occ=parseFloat(row[3]),rev=parseFloat(row[8]),adr=parseFloat(row[6]);
+      if(!isNaN(occ)&&!isNaN(rev)){newOD[key]=[occ,rev,isNaN(adr)?0:Math.round(adr)];count++;}
     }
     if(count===0){statusEl.textContent="❌ 找不到資料";statusEl.style.color="#dc3545";return;}
     statusEl.textContent="✅ 讀取 "+count+" 筆，上傳中...";statusEl.style.color="#fd7e14";
